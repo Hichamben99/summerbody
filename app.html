@@ -215,6 +215,88 @@ html,body{overflow-x:hidden}
 .stat .v{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .qa button{min-height:66px;line-height:1.25}
 
+/* Gamification : carte niveau */
+.level-card{background:linear-gradient(135deg,#1f927e 0%,#2bb39a 55%,#5cc9a7 100%);color:#fff;border:0;cursor:pointer}
+.level-card .lvl-badge{width:54px;height:54px;border-radius:18px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900}
+.level-card .lv-t{font-size:19px;font-weight:800;letter-spacing:-.3px}
+.level-card .lv-j{font-size:26px;font-weight:900;letter-spacing:-.5px}
+.xpbar{height:12px;background:rgba(255,255,255,.22);border-radius:99px;overflow:hidden;margin-top:14px}
+.xpbar > i{display:block;height:100%;background:linear-gradient(90deg,#ffd27a,#ff8a6b);border-radius:99px;transition:width .8s}
+.journey{position:relative;height:4px;background:rgba(255,255,255,.25);border-radius:9px;margin-top:12px}
+.journey > i{display:block;height:100%;background:#fff;border-radius:9px}
+.journey .flag{position:absolute;right:-4px;top:-11px;font-size:14px}
+.lvl-burst{width:110px;height:110px;margin:0 auto;border-radius:32px;background:linear-gradient(135deg,var(--teal),#7fd6c3);color:#fff;font-size:52px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 14px 34px rgba(43,179,154,.45);animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{0%{transform:scale(.3) rotate(-10deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+
+/* Missions du jour */
+.missions .slot-h{font-size:13px;font-weight:800;color:var(--muted);margin:14px 2px 4px;letter-spacing:.2px}
+.task{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.task:last-of-type{border-bottom:0}
+.task .tick{width:26px;height:26px;border-radius:9px;border:2px solid rgba(29,43,40,.18);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;flex-shrink:0;transition:all .2s}
+.task.hi .tick{border-color:var(--peach)}
+.task.done .tick{background:var(--teal);border-color:var(--teal)}
+.task .tl{flex:1;min-width:0;display:flex;flex-direction:column}
+.task .tx{font-size:14px;font-weight:600;line-height:1.3}
+.task.done .tx{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(29,43,40,.3)}
+.task .th{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.3}
+.task .xp{font-size:12px;font-weight:800;color:var(--teal-d);background:var(--teal-soft);padding:3px 8px;border-radius:99px;white-space:nowrap}
+.task .rm{border:0;background:none;color:var(--muted);font-size:18px;padding:0 4px}
+.main-mission{display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,var(--peach),#ffb39e);color:#fff;border-radius:18px;padding:14px;margin-top:10px;cursor:pointer;box-shadow:0 8px 20px rgba(255,138,107,.3)}
+.main-mission .mm-ic{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;flex-shrink:0}
+.main-mission .mm-t{font-size:17px;font-weight:800;letter-spacing:-.2px;line-height:1.25}
+.main-mission.done{background:linear-gradient(135deg,var(--teal),#7fd6c3);box-shadow:0 8px 20px rgba(43,179,154,.3)}
+.warmup summary{cursor:pointer;list-style:none}
+
+/* Trophées */
+.badges{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.badge{background:var(--card2);border-radius:16px;padding:12px;text-align:center;opacity:.45;filter:grayscale(1)}
+.badge.on{background:var(--yellow-soft);opacity:1;filter:none}
+.badge .bi{font-size:28px}
+.badge .bn{font-weight:800;font-size:13px;margin-top:4px}
+.badge .bd{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.3}
+
+/* Compagnon Volthys */
+.mon{width:100%;height:100%;overflow:visible}
+.mon .bob{animation:monBob 2.8s ease-in-out infinite;transform-origin:100px 190px}
+.mon .wobble{animation:monWobble 3s ease-in-out infinite;transform-origin:100px 180px}
+.mon .eye{animation:monBlink 4.5s infinite;transform-box:fill-box;transform-origin:center}
+.mon .spark{animation:monFlick 1.1s steps(2) infinite}
+.mon .s2{animation-delay:.5s}
+.mon .glow{filter:drop-shadow(0 0 4px currentColor);animation:monGlow 2s ease-in-out infinite}
+.mon .aura{animation:monAura 3s ease-in-out infinite;transform-origin:100px 96px}
+.mon .wing{animation:monWing 3.2s ease-in-out infinite;transform-origin:100px 90px}
+.mon.sleepy .bob{animation-duration:5s}
+.mon.sleepy .eye{transform:scaleY(.12);animation:none}
+.mon .zz{animation:monZ 2.4s ease-in-out infinite}.mon .z2{animation-delay:1.2s}
+.mon.happy .bob{animation:monJump .5s ease-out 3}
+@keyframes monBob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-6px) scale(1.01,.99)}}
+@keyframes monWobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-4deg)}40%{transform:rotate(3deg)}60%{transform:rotate(-2deg)}80%{transform:rotate(0)}}
+@keyframes monBlink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes monFlick{0%{opacity:1}100%{opacity:.25}}
+@keyframes monGlow{0%,100%{opacity:1}50%{opacity:.65}}
+@keyframes monAura{0%,100%{transform:scale(.95);opacity:.8}50%{transform:scale(1.05);opacity:1}}
+@keyframes monWing{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.06) translateY(-3px)}}
+@keyframes monZ{0%{opacity:0;transform:translate(0,6px)}50%{opacity:1}100%{opacity:0;transform:translate(6px,-8px)}}
+@keyframes monJump{0%,100%{transform:translateY(0)}40%{transform:translateY(-22px)}}
+
+.mon-card{background:linear-gradient(150deg,#1d2266 0%,#3c3ec4 45%,#6c3ce0 80%,#a24bd0 100%);color:#fff;border:0;cursor:pointer;position:relative;overflow:hidden}
+.mon-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 25% 40%,rgba(110,200,255,.35),transparent 55%);pointer-events:none}
+.mon-wrap{display:flex;gap:12px;align-items:center;position:relative}
+.mon-stage{width:132px;height:132px;flex-shrink:0;margin:-8px -6px -8px -10px}
+.mon-info{flex:1;min-width:0}
+.mon-name{font-size:21px;font-weight:900;letter-spacing:-.3px}
+.mon-sub{font-size:12px;opacity:.85;margin-top:2px}
+.mon-lv{display:inline-flex;gap:6px;align-items:center;background:rgba(255,255,255,.16);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:800;margin-top:8px}
+.mon-card .xpbar{background:rgba(255,255,255,.18)}
+.evo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.evo{background:var(--card2);border-radius:16px;padding:6px 6px 8px;text-align:center}
+.evo .mon-s{height:86px}
+.evo .en{font-size:12px;font-weight:800}.evo .el{font-size:11px;color:var(--muted)}
+.evo.locked .mon{filter:brightness(0) opacity(.25)}
+.evo.cur{background:linear-gradient(150deg,#dfe2ff,#eadcff);box-shadow:inset 0 0 0 2px #6c3ce0}
+.evolve-flash{animation:evoFlash 2.2s ease-out}
+@keyframes evoFlash{0%{filter:brightness(0) invert(1);transform:scale(.6)}35%{filter:brightness(0) invert(1);transform:scale(1.15)}60%{filter:brightness(2.2)}100%{filter:none;transform:scale(1)}}
+
 </style>
 </head>
 <body>
@@ -244,7 +326,7 @@ html,body{overflow-x:hidden}
 'use strict';
 /* Summer Body — appli de suivi 100 % locale (IndexedDB). Aucune donnée ne quitte le téléphone. */
 
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '2.0.0';
 
 /* ---------------- Base de données locale ---------------- */
 const DB_NAME = 'summerbody';
@@ -464,52 +546,509 @@ const QA_ICONS = {
   chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>',
 };
 
+/* ================= PROGRAMME SUMMER BODY (16 nov. 2026 → 10 mars 2027) ================= */
+const PROG_START = '2026-11-16';
+const PROG_END = '2027-03-10';
+const CHECKINS = ['2026-12-13', '2027-01-17', '2027-02-14', '2027-03-10'];
+const DELOAD = ['2027-01-11', '2027-01-17'];
+const PHASES = [
+  { n: 1, nom: 'Les bases', from: '2026-11-16', to: '2026-12-13', kcal: 2600, conseil: 'Mange normalement, monte les protéines, prends l\'habitude de la salle.' },
+  { n: 2, nom: 'La perte de gras', from: '2026-12-14', to: '2027-02-21', kcal: 2300, conseil: 'Applique les leviers : portions, pain, sauces, boissons, grignotages.' },
+  { n: 3, nom: 'La finition', from: '2027-02-22', to: '2027-03-10', kcal: 2150, conseil: 'Réduis encore un peu les féculents le soir.' },
+];
+const PROGRAMME_SB = {
+  id: 'summerbody-2027-v2',
+  nom: 'Programme Summer Body',
+  description: 'Du 16 novembre 2026 au 10 mars 2027 · 3 séances de salle + 2 jiu-jitsu par semaine · ~60 min échauffement compris.',
+  seancesParSemaine: 3,
+  jours: [
+    { nom: 'Séance A', jourSemaine: 1, exercices: [
+      { nom: 'Squat (barre ou Smith)', series: 3, reps: '6–8', repos: 150, conseil: 'Genoux dans l\'axe des pieds, dos neutre, cuisses au moins parallèles. Si pris : Smith ou hack squat. Courbatures du JJB ? Garde 3 reps en réserve.' },
+      { nom: 'Développé couché barre', series: 3, reps: '6–8', repos: 150, conseil: 'Omoplates serrées, pieds ancrés, barre vers le bas des pecs. Si pris : chest press ou Smith.' },
+      { nom: 'Rowing haltère un bras', series: 3, reps: '8–10', repos: 120 },
+      { nom: 'Développé militaire haltères', series: 2, reps: '8–10', repos: 90, conseil: 'Si pris : shoulder press (machine).' },
+      { nom: 'Curl biceps haltères', series: 2, reps: '10–12', repos: 90 },
+      { nom: 'Pallof press (poulie)', series: 3, reps: '10 / côté', repos: 60, conseil: 'Anti-rotation : le tronc qui résiste aux rotations au jiu-jitsu.' },
+    ] },
+    { nom: 'Séance B', jourSemaine: 4, exercices: [
+      { nom: 'Soulevé de terre roumain', series: 3, reps: '8–10', repos: 150, conseil: 'Hanches vers l\'arrière, barre qui frôle les cuisses, dos plat, stop à l\'étirement des ischios. Filme-toi de profil.' },
+      { nom: 'Tirage vertical (ou tractions assistées)', series: 3, reps: '8–10', repos: 120 },
+      { nom: 'Développé incliné haltères', series: 3, reps: '8–10', repos: 120 },
+      { nom: 'Fentes bulgares', series: 2, reps: '10 / jambe', repos: 90, conseil: 'Si pris : fentes au Smith ou presse à une jambe.' },
+      { nom: 'Élévations latérales', series: 3, reps: '12–15', repos: 90 },
+      { nom: 'Extension triceps à la poulie', series: 2, reps: '10–12', repos: 90 },
+      { nom: 'Farmer walk', series: 3, reps: '30–40 m', repos: 90, conseil: 'Haltères lourds, marche gainée : la poigne pour tes saisies au jiu-jitsu.' },
+    ] },
+    { nom: 'Séance C', jourSemaine: 6, exercices: [
+      { nom: 'Presse à cuisses', series: 3, reps: '10–12', repos: 120, conseil: 'Sans forcer : 2 à 3 répétitions en réserve (jiu-jitsu demain).' },
+      { nom: 'Développé couché haltères', series: 3, reps: '8–12', repos: 120 },
+      { nom: 'Rowing assis à la poulie', series: 3, reps: '10–12', repos: 90, conseil: 'Si pris : rowing machine ou rowing haltère.' },
+      { nom: 'Tirage vertical prise serrée', series: 2, reps: '10–12', repos: 90 },
+      { nom: 'Élévations latérales', series: 3, reps: '15', repos: 90 },
+      { nom: 'Face pull', series: 2, reps: '15', repos: 90 },
+      { nom: 'Suspension à la barre (dead hang)', series: 3, reps: 'max (s)', repos: 90, conseil: 'Note ton temps en secondes dans la colonne « reps ».' },
+    ] },
+  ],
+};
+const WARMUP = ['3 min de vélo ou de rameur, intensité modérée', 'Mobilité : 10 rotations thoraciques / côté, 10 « 90/90 » de hanches, 10 cercles d\'épaules à l\'élastique', 'Activation : 10 ponts fessiers, 10 face pull légers', 'Montée en charge sur le 1er gros exercice : à vide, 50 %, 75 %'];
+const NUTRI_CONTEXT_SB = `Programme Summer Body (16 nov. 2026 → 10 mars 2027). Départ InBody 20/09 : 72,7 kg, 20,4 % de masse grasse, 32,9 kg de muscle squelettique, gras surtout au tronc (7,6 kg, 185 % de la norme), graisse viscérale 56,7 cm² (sain). Basic-Fit 13/11 : 73,3 kg, 19 % de masse grasse. Il se mesure désormais uniquement sur la balance Basic-Fit. Objectif : 13–15 % de masse grasse, +1,5 à 2,5 kg de muscle, poids ~70–71 kg (recomposition). Entraînement : salle lundi/jeudi/samedi, jiu-jitsu mercredi (1 h) et dimanche (2 h), 8 000–10 000 pas/jour. Il mange les repas de ses parents : il ne contrôle pas les recettes, il joue sur les portions et les ajouts. Protéines : ~140 g/jour (portion de viande/poisson/œufs grande comme la main à chaque repas + 1–2 boosters : skyr 250 g, 3 œufs, thon, whey). Assiette : ½ légumes, ¼ protéines, ¼ féculents ; pas de 2e assiette de féculents sauf après le jiu-jitsu du dimanche. Pain 1–2 morceaux max, moins de sauce/huile, uniquement eau/thé/café sans sucre, grignotages remplacés par fruit/skyr/amandes. Calories : phase 1 (16 nov.–13 déc.) maintenance ~2 600 ; phase 2 (14 déc.–21 fév.) ~2 300 ; phase 3 (22 fév.–10 mars) ~2 100–2 200. Fêtes 24 déc.–1er janv. : profiter sans culpabiliser, garder protéines et salle.`;
+
+const daysBetween = (a, b) => Math.round((parseKey(b) - parseKey(a)) / 864e5);
+const inRange = (k, a, b) => k >= a && k <= b;
+function phaseOf(k) { return PHASES.find(p => inRange(k, p.from, p.to)) || null; }
+function progWeek(k) { const d = daysBetween(PROG_START, k); return d < 0 ? 0 : Math.floor(d / 7) + 1; }
+const isDeload = k => inRange(k, DELOAD[0], DELOAD[1]);
+const isFestive = k => inRange(k, '2026-12-24', '2027-01-01');
+
+/* Objectifs « effectifs » : le repère calorique suit la phase du programme si l'utilisateur n'en a pas fixé un. */
+async function getGoals() {
+  const g = { ...(await getSetting('goals', {})) };
+  const ph = phaseOf(dateKey());
+  if (!g.kcalTarget) g.kcalTarget = ph ? ph.kcal : (dateKey() < PROG_START ? 2600 : null);
+  return g;
+}
+
+/* Première installation : on charge le programme, les objectifs, le bilan InBody et les infos du coach. */
+async function seedProgramme(force = false) {
+  if (!force && await getSetting('seed_sb_v2')) return;
+  const prog = await getSetting('program');
+  if (force || !prog || !String(prog.id || '').startsWith('summerbody-2027')) await setSetting('program', PROGRAMME_SB);
+  else if (prog.id !== PROGRAMME_SB.id) await setSetting('program', PROGRAMME_SB);
+  const g = await getSetting('goals', {});
+  await setSetting('goals', { name: 'Hicham', startWeight: 73.3, targetWeight: 70.5, startBF: 19, targetBF: 14,
+    targetDate: PROG_END, sessionsPerWeek: 3, kcalTarget: null, ...(force ? {} : g) });
+  if (force || !(await getSetting('nutritionContext', ''))) await setSetting('nutritionContext', NUTRI_CONTEXT_SB);
+  const body = await dbAll('body');
+  if (!body.some(b => b.id === 'inbody-2026-09-20'))
+    await dbPut('body', { id: 'inbody-2026-09-20', date: '2026-09-20', ts: Date.parse('2026-09-20T08:00:00'), source: 'InBody', weight: 72.7, bodyfat: 20.4, muscle: 32.9, note: 'InBody de départ · gras du tronc 7,6 kg · viscéral 56,7 cm²' });
+  if (!body.some(b => b.id === 'basicfit-2026-11-13'))
+    await dbPut('body', { id: 'basicfit-2026-11-13', date: '2026-11-13', ts: Date.parse('2026-11-13T08:00:00'), source: 'Basic-Fit', weight: 73.3, bodyfat: 19, leanpct: 77, note: 'Basic-Fit de départ' });
+  if (!(await getSetting('firstDay'))) await setSetting('firstDay', dateKey());
+  await setSetting('seed_sb_v2', true);
+}
+
+/* ================= COMPAGNON : la lignée VOLTHYS (eau + foudre), création originale ================= */
+const MON_STAGES = [
+  { lvl: 1, nom: 'Œuf d\'orage', desc: 'Il vibre doucement… quelque chose se prépare.' },
+  { lvl: 3, nom: 'Plouvi', desc: 'Une goutte vivante qui crépite quand elle est contente.' },
+  { lvl: 6, nom: 'Ondrik', desc: 'Curieux et nerveux, sa queue lance des étincelles.' },
+  { lvl: 10, nom: 'Fulgaro', desc: 'Debout sur ses pattes, il charge la foudre dans ses poings.' },
+  { lvl: 15, nom: 'Tempestor', desc: 'Un guerrier en armure qui fend les vagues.' },
+  { lvl: 20, nom: 'Volthys', desc: 'La forme ultime : le maître des tempêtes.' },
+];
+const monStageOf = lvl => MON_STAGES.reduce((s, st, i) => lvl >= st.lvl ? i : s, 0);
+
+/* Voie d'évolution : la force (records, semaines complètes) ou la technique (jiu-jitsu, journées parfaites). */
+function monPath(game) {
+  const force = (game.prs || 0) * 3 + (game.fullWeeks || 0) * 4;
+  const tech = (game.jjb || 0) * 3 + (game.perfectDays || 0) * 2;
+  return force >= tech ? 'force' : 'technique';
+}
+const MON_ACC = { force: '#ff3b5c', technique: '#36d6ff' };
+
+const MON_DEFS = `<defs>
+  <linearGradient id="mnB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#63b6ff"/><stop offset="1" stop-color="#3c55f0"/></linearGradient>
+  <linearGradient id="mnP" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c39bff"/><stop offset="1" stop-color="#6c3ce0"/></linearGradient>
+  <linearGradient id="mnR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7088"/><stop offset="1" stop-color="#d81b3c"/></linearGradient>
+  <linearGradient id="mnA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b3f9a"/><stop offset="1" stop-color="#1c1f5c"/></linearGradient>
+  <linearGradient id="mnE" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fc8ff"/><stop offset=".55" stop-color="#6a5cff"/><stop offset="1" stop-color="#8a3fd6"/></linearGradient>
+  <linearGradient id="mnW" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9ee6ff" stop-opacity=".95"/><stop offset="1" stop-color="#6c3ce0" stop-opacity=".75"/></linearGradient>
+  <radialGradient id="mnG"><stop offset="0" stop-color="#ffffff" stop-opacity=".9"/><stop offset=".45" stop-color="#9fb4ff" stop-opacity=".35"/><stop offset="1" stop-color="#9fb4ff" stop-opacity="0"/></radialGradient>
+</defs>`;
+
+const eye = (x, y, r = 10) => `<g class="eye"><circle cx="${x}" cy="${y}" r="${r}" fill="#fff"/><circle cx="${x + r * .15}" cy="${y + r * .1}" r="${r * .62}" fill="#1b1f3b"/><circle cx="${x + r * .45}" cy="${y - r * .3}" r="${r * .28}" fill="#fff"/></g>`;
+const bolt = (x, y, s = 1, fill = 'url(#mnP)', cls = 'spark') => `<polygon class="${cls}" transform="translate(${x} ${y}) scale(${s})" points="0,-16 -7,2 -1,2 -5,16 8,-3 1,-3 5,-16" fill="${fill}"/>`;
+
+function monsterSVG(stage, path = 'force', mood = '') {
+  const acc = MON_ACC[path] || MON_ACC.force;
+  const shadow = `<ellipse cx="100" cy="190" rx="${[38, 34, 42, 46, 50, 56][stage]}" ry="6" fill="rgba(20,20,60,.15)"/>`;
+  let body = '';
+  if (stage === 0) body = `
+    <g class="wobble">
+      <ellipse cx="100" cy="122" rx="46" ry="60" fill="url(#mnE)"/>
+      <path d="M58 120 Q72 108 86 120 T114 120 T142 120" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+      <path d="M62 140 Q76 128 90 140 T118 140 T140 138" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".3"/>
+      <path d="M92 66 L104 84 L96 90 L110 106" fill="none" stroke="url(#mnR)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <ellipse cx="80" cy="92" rx="8" ry="15" fill="#fff" opacity=".35" transform="rotate(20 80 92)"/>
+      <circle cx="122" cy="158" r="5" fill="#fff" opacity=".25"/><circle cx="72" cy="160" r="4" fill="#fff" opacity=".2"/>
+    </g>
+    ${bolt(150, 70, .7, '#ffffff', 'spark')}${bolt(48, 96, .5, '#c39bff', 'spark s2')}`;
+  if (stage === 1) body = `
+    <g class="bob">
+      <path d="M100 52 C124 88 152 110 152 140 A52 48 0 0 1 48 140 C48 110 76 88 100 52Z" fill="url(#mnB)"/>
+      <ellipse cx="100" cy="156" rx="30" ry="20" fill="#cfeaff" opacity=".55"/>
+      <ellipse cx="76" cy="100" rx="7" ry="14" fill="#fff" opacity=".4" transform="rotate(25 76 100)"/>
+      ${bolt(100, 42, .95, 'url(#mnP)')}
+      ${eye(84, 134, 11)}${eye(116, 134, 11)}
+      <ellipse cx="70" cy="152" rx="8" ry="5" fill="#ff6b81" opacity=".55"/><ellipse cx="130" cy="152" rx="8" ry="5" fill="#ff6b81" opacity=".55"/>
+      <path d="M92 152 Q100 160 108 152" fill="none" stroke="#1b1f3b" stroke-width="3" stroke-linecap="round"/>
+    </g>`;
+  if (stage === 2) body = `
+    <g class="bob">
+      <path d="M138 150 Q172 152 170 116" fill="none" stroke="url(#mnB)" stroke-width="13" stroke-linecap="round"/>
+      ${bolt(170, 104, .9, 'url(#mnR)')}
+      <ellipse cx="80" cy="174" rx="15" ry="9" fill="#2c43c4"/><ellipse cx="120" cy="174" rx="15" ry="9" fill="#2c43c4"/>
+      <path d="M60 104 Q26 86 34 56 Q58 80 74 92Z" fill="url(#mnP)"/><path d="M140 104 Q174 86 166 56 Q142 80 126 92Z" fill="url(#mnP)"/>
+      <circle cx="100" cy="128" r="50" fill="url(#mnB)"/>
+      <ellipse cx="100" cy="146" rx="31" ry="24" fill="#cfeaff" opacity=".55"/>
+      <ellipse cx="74" cy="100" rx="7" ry="13" fill="#fff" opacity=".35" transform="rotate(30 74 100)"/>
+      <path d="M100 82 L107 92 L100 102 L93 92Z" fill="url(#mnR)"/>
+      ${eye(82, 120, 12)}${eye(118, 120, 12)}
+      <path d="M86 142 Q100 156 114 142 Q100 148 86 142Z" fill="#1b1f3b"/><path d="M106 144 L109 150 L111 143Z" fill="#fff"/>
+      <ellipse cx="66" cy="138" rx="7" ry="4" fill="#ff6b81" opacity=".5"/><ellipse cx="134" cy="138" rx="7" ry="4" fill="#ff6b81" opacity=".5"/>
+    </g>`;
+  if (stage === 3) body = `
+    <g class="bob">
+      <path d="M128 150 Q176 150 178 104 Q176 88 166 82" fill="none" stroke="url(#mnB)" stroke-width="14" stroke-linecap="round"/>
+      ${bolt(166, 72, 1.05, 'url(#mnR)')}
+      <rect x="76" y="150" width="18" height="30" rx="8" fill="#3449d6"/><rect x="106" y="150" width="18" height="30" rx="8" fill="#3449d6"/>
+      <ellipse cx="84" cy="182" rx="15" ry="7" fill="#232f9e"/><ellipse cx="116" cy="182" rx="15" ry="7" fill="#232f9e"/>
+      <path d="M72 108 Q50 128 52 150" fill="none" stroke="url(#mnB)" stroke-width="15" stroke-linecap="round"/>
+      <path d="M128 108 Q150 128 148 150" fill="none" stroke="url(#mnB)" stroke-width="15" stroke-linecap="round"/>
+      <circle cx="52" cy="154" r="11" fill="${acc}"/><circle cx="148" cy="154" r="11" fill="${acc}"/>
+      ${bolt(40, 150, .55, '#fff', 'spark')}${bolt(160, 150, .55, '#fff', 'spark s2')}
+      <ellipse cx="100" cy="126" rx="35" ry="38" fill="url(#mnB)"/>
+      <ellipse cx="100" cy="134" rx="21" ry="24" fill="#cfeaff" opacity=".5"/>
+      <path d="M86 108 L96 120 L88 126 L100 142" fill="none" stroke="url(#mnP)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M72 62 Q44 50 46 28 Q66 46 80 54Z" fill="url(#mnP)"/><path d="M128 62 Q156 50 154 28 Q134 46 120 54Z" fill="url(#mnP)"/>
+      <path d="M86 46 Q100 6 116 44 Q106 38 100 42Z" fill="url(#mnP)"/>
+      <circle cx="100" cy="72" r="32" fill="url(#mnB)"/>
+      <ellipse cx="82" cy="58" rx="6" ry="11" fill="#fff" opacity=".35" transform="rotate(30 82 58)"/>
+      <path d="M100 48 L106 56 L100 64 L94 56Z" fill="url(#mnR)"/>
+      ${eye(87, 74, 9)}${eye(113, 74, 9)}
+      <path d="M77 63 L95 68" stroke="#1b1f3b" stroke-width="4" stroke-linecap="round"/><path d="M123 63 L105 68" stroke="#1b1f3b" stroke-width="4" stroke-linecap="round"/>
+      <path d="M90 90 Q100 96 112 88" fill="none" stroke="#1b1f3b" stroke-width="3" stroke-linecap="round"/>
+    </g>`;
+  if (stage === 4) body = `
+    <g class="bob">
+      <path d="M68 78 L132 78 L146 168 Q134 158 123 170 Q111 158 100 170 Q89 158 77 170 Q66 158 54 168Z" fill="url(#mnP)" opacity=".9"/>
+      <rect x="78" y="128" width="18" height="48" rx="7" fill="url(#mnA)"/><rect x="104" y="128" width="18" height="48" rx="7" fill="url(#mnA)"/>
+      <ellipse cx="87" cy="150" rx="9" ry="7" fill="url(#mnB)"/><ellipse cx="113" cy="150" rx="9" ry="7" fill="url(#mnB)"/>
+      <path d="M74 182 L98 182 L96 172 L78 172Z" fill="url(#mnB)"/><path d="M102 182 L126 182 L122 172 L104 172Z" fill="url(#mnB)"/>
+      <path d="M70 90 Q54 112 56 134" fill="none" stroke="url(#mnB)" stroke-width="13" stroke-linecap="round"/>
+      <path d="M130 90 Q146 112 144 134" fill="none" stroke="url(#mnB)" stroke-width="13" stroke-linecap="round"/>
+      <rect x="45" y="128" width="22" height="22" rx="7" fill="${acc}"/><rect x="133" y="128" width="22" height="22" rx="7" fill="${acc}"/>
+      ${bolt(42, 150, .6, '#fff', 'spark')}${bolt(158, 150, .6, '#fff', 'spark s2')}
+      <path d="M74 84 L126 84 L120 126 L100 136 L80 126Z" fill="url(#mnA)"/>
+      <path d="M80 124 L120 124 L118 132 L82 132Z" fill="url(#mnR)"/>
+      ${bolt(100, 104, 1, acc, 'glow')}
+      <ellipse cx="70" cy="86" rx="16" ry="11" fill="url(#mnP)"/><ellipse cx="130" cy="86" rx="16" ry="11" fill="url(#mnP)"/>
+      <path d="M86 34 Q100 -2 116 32 Q106 26 100 30Z" fill="url(#mnP)"/>
+      <path d="M76 44 Q62 32 64 16 Q76 30 84 36Z" fill="url(#mnP)"/><path d="M124 44 Q138 32 136 16 Q124 30 116 36Z" fill="url(#mnP)"/>
+      <path d="M78 52 Q78 30 100 28 Q122 30 122 52 L118 70 Q100 80 82 70Z" fill="url(#mnB)"/>
+      <path d="M82 50 L118 50 L116 60 L84 60Z" fill="#141633"/>
+      <g class="eye"><rect x="88" y="52" width="9" height="5" rx="2" fill="${acc}" class="glow"/><rect x="103" y="52" width="9" height="5" rx="2" fill="${acc}" class="glow"/></g>
+      <ellipse cx="88" cy="38" rx="4" ry="7" fill="#fff" opacity=".35" transform="rotate(30 88 38)"/>
+    </g>`;
+  if (stage === 5) body = `
+    <circle cx="100" cy="96" r="88" fill="url(#mnG)" class="aura"/>
+    <g class="bob">
+      <g class="wing">
+        <path d="M76 84 Q30 60 10 20 Q34 34 44 30 Q38 50 54 56 Q44 70 70 92Z" fill="url(#mnW)"/>
+        <path d="M124 84 Q170 60 190 20 Q166 34 156 30 Q162 50 146 56 Q156 70 130 92Z" fill="url(#mnW)"/>
+        <path d="M66 74 L40 46 M62 82 L28 62" stroke="#fff" stroke-width="2" opacity=".6" stroke-linecap="round"/>
+        <path d="M134 74 L160 46 M138 82 L172 62" stroke="#fff" stroke-width="2" opacity=".6" stroke-linecap="round"/>
+      </g>
+      <path d="M68 80 L132 80 L150 174 Q137 164 125 176 Q112 164 100 176 Q88 164 75 176 Q63 164 50 174Z" fill="url(#mnP)" opacity=".92"/>
+      <rect x="77" y="128" width="19" height="50" rx="7" fill="url(#mnA)"/><rect x="104" y="128" width="19" height="50" rx="7" fill="url(#mnA)"/>
+      <path d="M78 140 L96 140 L94 148 L80 148Z" fill="url(#mnR)"/><path d="M104 140 L122 140 L120 148 L106 148Z" fill="url(#mnR)"/>
+      <path d="M72 186 L98 186 L96 174 L76 174Z" fill="url(#mnB)"/><path d="M102 186 L128 186 L124 174 L104 174Z" fill="url(#mnB)"/>
+      <path d="M156 186 L156 26" stroke="#2a2e7a" stroke-width="5" stroke-linecap="round"/>
+      <path d="M156 30 L146 10 M156 30 L156 4 M156 30 L166 10" stroke="${acc}" stroke-width="5" stroke-linecap="round" class="glow"/>
+      ${bolt(156, 48, .7, '#fff', 'spark')}
+      <path d="M70 92 Q54 112 56 132" fill="none" stroke="url(#mnB)" stroke-width="13" stroke-linecap="round"/>
+      <path d="M130 92 Q150 104 154 120" fill="none" stroke="url(#mnB)" stroke-width="13" stroke-linecap="round"/>
+      <rect x="45" y="126" width="22" height="22" rx="7" fill="${acc}"/><rect x="144" y="112" width="22" height="22" rx="7" fill="${acc}"/>
+      ${bolt(40, 150, .6, '#fff', 'spark s2')}
+      <path d="M72 86 L128 86 L122 128 L100 140 L78 128Z" fill="url(#mnA)"/>
+      <path d="M72 86 L128 86 L124 96 L76 96Z" fill="url(#mnR)"/>
+      <circle cx="100" cy="112" r="9" fill="${acc}" class="glow"/><circle cx="97" cy="109" r="3" fill="#fff" opacity=".8"/>
+      <path d="M78 126 L122 126 L120 134 L80 134Z" fill="url(#mnR)"/>
+      <ellipse cx="68" cy="88" rx="17" ry="12" fill="url(#mnP)"/><ellipse cx="132" cy="88" rx="17" ry="12" fill="url(#mnP)"/>
+      <path d="M90 30 L100 2 L110 30Z" fill="url(#mnR)"/>
+      <path d="M80 40 Q66 26 70 8 Q80 24 88 32Z" fill="url(#mnP)"/><path d="M120 40 Q134 26 130 8 Q120 24 112 32Z" fill="url(#mnP)"/>
+      <path d="M78 52 Q78 28 100 26 Q122 28 122 52 L118 70 Q100 82 82 70Z" fill="url(#mnB)"/>
+      <path d="M82 49 L118 49 L116 60 L84 60Z" fill="#141633"/>
+      <g class="eye"><rect x="87" y="51" width="10" height="5" rx="2" fill="${acc}" class="glow"/><rect x="103" y="51" width="10" height="5" rx="2" fill="${acc}" class="glow"/></g>
+      <ellipse cx="88" cy="36" rx="4" ry="7" fill="#fff" opacity=".35" transform="rotate(30 88 36)"/>
+    </g>`;
+  const zz = mood === 'sleepy' ? `<text x="140" y="60" class="zz" font-size="20" font-weight="800" fill="#6c3ce0">z</text><text x="154" y="44" class="zz z2" font-size="14" font-weight="800" fill="#6c3ce0">z</text>` : '';
+  return `<svg class="mon ${mood}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">${MON_DEFS}${shadow}${body}${zz}</svg>`;
+}
+
+/* ================= MISSIONS DU JOUR & GAMIFICATION ================= */
+const SLOTS = [['matin', '🌅 Matin'], ['midi', '☀️ Midi'], ['soir', '🌙 Soir']];
+const slotOfTime = t => { const h = parseInt((t || '12').split(':')[0], 10); return h < 11 ? 'matin' : h < 16 ? 'midi' : 'soir'; };
+
+/* Index des données par jour, pour valider les missions automatiquement. */
+function buildIndex(meals, workouts, body) {
+  const ix = {};
+  const get = k => (ix[k] = ix[k] || { meals: { matin: 0, midi: 0, soir: 0 }, prot: 0, workouts: 0, weigh: false, checkin: false });
+  meals.forEach(m => { const d = get(m.date); d.meals[slotOfTime(m.time)]++; d.prot += m.p || 0; });
+  workouts.forEach(w => { get(w.date).workouts++; });
+  body.forEach(b => { const d = get(b.date); if (b.weight != null) d.weigh = true; if (b.weight != null && (b.waist != null || b.photo)) d.checkin = true; });
+  return ix;
+}
+
+/* La liste des missions d'une journée, selon le jour de la semaine et le calendrier du programme. */
+function tasksFor(k, custom = []) {
+  const wd = parseKey(k).getDay(); // 0 = dimanche
+  const started = k >= PROG_START, finished = k > PROG_END;
+  const T = [];
+  const add = (id, slot, label, xp, opt = {}) => T.push({ id, slot, label, xp, prio: opt.prio || 'normale', auto: opt.auto || null, hint: opt.hint || '' });
+
+  // Mission principale
+  const seance = PROGRAMME_SB.jours.find(j => j.jourSemaine === wd);
+  if (!started) add('main', 'main', 'Prépare-toi : relis ton programme dans l\'onglet Séances', 30, { prio: 'haute', hint: 'Le programme démarre le lundi 16 novembre.' });
+  else if (finished) add('main', 'main', 'Garde le rythme : une séance ou 45 min de marche', 60, { prio: 'haute' });
+  else if (seance) add('main', 'main', `${seance.nom} à la salle`, 100, { prio: 'haute', auto: d => d.workouts > 0, hint: isDeload(k) ? 'Semaine allégée : mêmes charges, une série de moins.' : 'Garde 1 à 2 répétitions en réserve.' });
+  else if (wd === 3) add('main', 'main', 'Jiu-jitsu (1 h)', 80, { prio: 'haute' });
+  else if (wd === 0) add('main', 'main', 'Jiu-jitsu (2 h)', 100, { prio: 'haute', hint: 'Ce soir, la 2e portion de féculents est permise.' });
+  else add('main', 'main', 'Jour de repos actif : marche de 30 à 45 min', 40, { prio: 'haute', hint: 'Le repos fait partie du programme : c\'est là que tu progresses.' });
+
+  if (CHECKINS.includes(k)) add('checkin', 'matin', 'Check-in : balance Basic-Fit, tour de taille, photos face/profil/dos', 150, { prio: 'haute', auto: d => d.checkin, hint: 'Onglet Corps : la mesure Basic-Fit + tour de taille ou photo valide le check-in.' });
+
+  // Matin
+  if (seance && started) add('weigh', 'matin', 'Pesée sur la balance Basic-Fit (avant la séance)', 15, { prio: 'haute', auto: d => d.weigh, hint: 'Toujours dans les mêmes conditions : même heure, avant de manger si possible.' });
+  add('water', 'matin', 'Un grand verre d\'eau au réveil', 5);
+  add('creatine', 'matin', 'Créatine monohydrate (3 à 5 g)', 10, { hint: 'Tous les jours, même au repos : c\'est la régularité qui compte.' });
+  add('breakfast', 'matin', 'Petit-déj avec une protéine (skyr, œufs…)', 10, { auto: d => d.meals.matin > 0, hint: 'Envoie-le au coach pour qu\'il soit noté.' });
+  if ([2, 5].includes(wd) && started) add('mobility', 'matin', '10 min de mobilité / étirements', 15);
+
+  // Midi
+  add('lunch', 'midi', 'Déjeuner : ½ légumes, ¼ protéines, ¼ féculents', 15, { prio: 'haute', auto: d => d.meals.midi > 0, hint: 'Photo au coach = mission validée.' });
+  add('drinks', 'midi', 'Que de l\'eau, du thé ou du café sans sucre', 10);
+  if (seance && started) add('whey', 'midi', 'Whey après la séance (≈ 25 g de protéines)', 10, { hint: 'Les autres jours, seulement si tu es loin des 140 g.' });
+
+  // Soir
+  add('dinner', 'soir', wd === 0 ? 'Dîner post-JJB (2e portion de féculents OK)' : 'Dîner : pas de 2e assiette de féculents', 15, { prio: 'haute', auto: d => d.meals.soir > 0 });
+  add('protein', 'soir', '140 g de protéines atteints', 25, { prio: 'haute', auto: d => d.prot >= 140, hint: 'Calculé à partir des repas notés par le coach.' });
+  add('water2l', 'soir', 'Boire 2 L d\'eau dans la journée', 15, { hint: 'Un peu plus les jours de salle et de jiu-jitsu.' });
+  add('steps', 'soir', '8 000 pas minimum', 20);
+  add('magnesium', 'soir', 'Magnésium (dose indiquée sur ta boîte)', 10, { hint: 'Au dîner ou avant de dormir.' });
+  if (wd === 0 && started) add('review', 'soir', 'Bilan de la semaine : regarde ta moyenne de poids (onglet Corps)', 20);
+  add('sleep', 'soir', 'Au lit à temps pour 7 h 30 de sommeil', 15);
+
+  custom.forEach(c => add(c.id, c.slot, c.label, 10, { prio: c.prio || 'normale' }));
+  return T;
+}
+
+function dayStatus(k, rec, ix) {
+  const tasks = tasksFor(k, (rec && rec.custom) || []);
+  const d = ix[k] || { meals: { matin: 0, midi: 0, soir: 0 }, prot: 0, workouts: 0, weigh: false, checkin: false };
+  const done = (rec && rec.done) || {};
+  const list = tasks.map(t => ({ ...t, autoDone: !!(t.auto && t.auto(d)), done: !!done[t.id] || !!(t.auto && t.auto(d)) }));
+  const xp = list.filter(t => t.done).reduce((a, t) => a + t.xp, 0);
+  const perfect = list.length > 0 && list.every(t => t.done);
+  return { list, xp: xp + (perfect ? 50 : 0), perfect, doneCount: list.filter(t => t.done).length };
+}
+
+const LEVEL_TITLES = [[1, 'Recrue'], [3, 'Motivé'], [5, 'Régulier'], [8, 'Guerrier'], [11, 'Athlète'], [14, 'Machine'], [17, 'Spartiate'], [20, 'Légende Summer Body']];
+const xpForLevel = L => 50 * L * (L - 1); // niveau 2 = 100 XP, niveau 10 = 4 500 XP, niveau 20 = 19 000 XP
+function levelOf(xp) { let L = 1; while (xp >= xpForLevel(L + 1)) L++; return L; }
+const titleOf = L => LEVEL_TITLES.filter(([n]) => L >= n).pop()[1];
+
+/* Nombre de records battus au fil du temps (+25 XP chacun). */
+function prEvents(workouts) {
+  const best = {}; let n = 0;
+  [...workouts].sort((a, b) => a.ts - b.ts).forEach(w => (w.exercises || []).forEach(ex => {
+    const key = ex.name.trim().toLowerCase();
+    let top = 0; (ex.sets || []).forEach(s => { if (s.done) top = Math.max(top, est1RM(num(s.weight) || 0, num(s.reps) || 0)); });
+    if (top > 0) { if (best[key] && top > best[key]) n++; if (!best[key] || top > best[key]) best[key] = top; }
+  }));
+  return n;
+}
+
+async function computeGame() {
+  const [meals, workouts, body, settingsRows, firstDay] = await Promise.all([dbAll('meals'), dbAll('workouts'), dbAll('body'), dbAll('settings'), getSetting('firstDay')]);
+  const ix = buildIndex(meals, workouts, body);
+  const recs = Object.fromEntries(settingsRows.filter(r => r.key.startsWith('day:')).map(r => [r.key.slice(4), r.value]));
+  const today = dateKey();
+  const from = [firstDay || today, ...Object.keys(recs)].sort()[0];
+  let xp = 0, perfectDays = 0, protDays = 0, jjb = 0, daysXp = {};
+  for (let d = parseKey(from); dateKey(d) <= today; d = addDays(d, 1)) {
+    const k = dateKey(d), st = dayStatus(k, recs[k], ix);
+    xp += st.xp; daysXp[k] = st.xp;
+    if (st.perfect) perfectDays++;
+    if ((ix[k] || {}).prot >= 140 || (recs[k] && recs[k].done && recs[k].done.protein)) protDays++;
+    const main = st.list.find(t => t.id === 'main');
+    if (main && main.done && /Jiu-jitsu/.test(main.label)) jjb++;
+  }
+  // Séances faites hors des jours prévus : bonus
+  const plannedDays = new Set(PROGRAMME_SB.jours.map(j => j.jourSemaine));
+  const extra = workouts.filter(w => !plannedDays.has(parseKey(w.date).getDay())).length;
+  const prs = prEvents(workouts);
+  xp += extra * 60 + prs * 25;
+
+  // Semaines complètes (3 séances du lundi au dimanche)
+  const byWeek = {};
+  workouts.forEach(w => { const k = dateKey(weekStart(parseKey(w.date))); byWeek[k] = (byWeek[k] || 0) + 1; });
+  const fullWeeks = Object.values(byWeek).filter(n => n >= 3).length;
+  xp += fullWeeks * 100;
+
+  const streak = streakOf(activityDays(meals, workouts, body));
+  const checkins = CHECKINS.filter(c => c <= today && (ix[c] || {}).checkin).length;
+  const level = levelOf(xp);
+  const B = (id, ico, nom, desc, ok) => ({ id, ico, nom, desc, ok: !!ok });
+  const badges = [
+    B('first', '🏁', 'Premier pas', 'Ta première séance enregistrée', workouts.length >= 1),
+    B('week', '📆', 'Semaine complète', '3 séances dans la même semaine', fullWeeks >= 1),
+    B('week4', '🗓️', 'Un mois carré', '4 semaines complètes', fullWeeks >= 4),
+    B('s7', '🔥', 'En feu', '7 jours d\'affilée actifs', streak >= 7),
+    B('s30', '☄️', 'Inarrêtable', '30 jours d\'affilée actifs', streak >= 30),
+    B('pr1', '🏆', 'Record !', 'Battre un record personnel', prs >= 1),
+    B('pr10', '👑', 'Collectionneur', '10 records battus', prs >= 10),
+    B('prot7', '🥩', 'Protéiné', '140 g de protéines sur 7 jours', protDays >= 7),
+    B('perfect', '💯', 'Journée parfaite', 'Toutes les missions d\'une journée', perfectDays >= 1),
+    B('perfect10', '✨', 'Perfectionniste', '10 journées parfaites', perfectDays >= 10),
+    B('jjb10', '🥋', 'Tatami', '10 séances de jiu-jitsu cochées', jjb >= 10),
+    B('w25', '💪', 'Bête de salle', '25 séances de salle', workouts.length >= 25),
+    B('checkin1', '📸', 'Premier bilan', 'Check-in du 13 décembre', checkins >= 1),
+    B('checkin4', '🎯', 'Ligne d\'arrivée', 'Les 4 check-ins jusqu\'au 10 mars', checkins >= 4),
+    B('lvl10', '⭐', 'Niveau 10', 'Atteindre le niveau 10', level >= 10),
+    B('lvl20', '🌟', 'Légende', 'Atteindre le niveau 20', level >= 20),
+  ];
+  return { xp, level, title: titleOf(level), next: xpForLevel(level + 1), cur: xpForLevel(level), badges, perfectDays, prs, fullWeeks, streak, ix, recs, daysXp, extra, jjb };
+}
+
+async function getDayRec(k) { return (await getSetting('day:' + k)) || { done: {}, custom: [] }; }
+
+async function toggleTask(k, t) {
+  const before = await computeGame();
+  const rec = await getDayRec(k);
+  if (t.autoDone && !rec.done[t.id]) { toast('✓ Déjà validée automatiquement'); return; }
+  rec.done[t.id] = !rec.done[t.id];
+  if (!rec.done[t.id]) delete rec.done[t.id];
+  await setSetting('day:' + k, rec);
+  const after = await computeGame();
+  const diff = after.xp - before.xp;
+  if (diff > 0) { toast(`+${diff} XP ${diff >= 50 ? '🔥' : '⚡'}`); sessionStorage.setItem('monHappy', '1'); }
+  await checkLevelUp(after);
+}
+
+async function checkLevelUp(game) {
+  game = game || await computeGame();
+  const last = await getSetting('lastLevel', 1);
+  const lastBadges = new Set(await getSetting('seenBadges', []));
+  const newBadges = game.badges.filter(b => b.ok && !lastBadges.has(b.id));
+  if (game.level > last) {
+    navigator.vibrate && navigator.vibrate([80, 60, 80, 60, 160]);
+    const s0 = monStageOf(last), s1 = monStageOf(game.level);
+    const evolved = s1 > s0;
+    openSheet(`<div style="text-align:center;padding:12px 0">
+      ${evolved ? `<div style="width:190px;height:190px;margin:0 auto" class="evolve-flash">${monsterSVG(s1, monPath(game), 'happy')}</div>
+      <h2 style="margin-top:6px">${s0 === 0 ? 'L\'œuf a éclos !' : 'Évolution !'}</h2>
+      <div class="muted">${esc(MON_STAGES[s0].nom)} devient <b style="color:#6c3ce0">${esc(MON_STAGES[s1].nom)}</b></div>
+      <div class="small muted" style="margin-top:4px">${esc(MON_STAGES[s1].desc)}</div>` : `<div class="lvl-burst">${game.level}</div>`}
+      <h2 style="margin-top:14px">Niveau ${game.level} atteint !</h2>
+      <div class="muted">Nouveau titre : <b style="color:var(--teal-d)">${esc(game.title)}</b></div>
+      ${newBadges.length ? `<div style="margin-top:14px">${newBadges.map(b => `<span class="chip good">${b.ico} ${esc(b.nom)}</span>`).join('')}</div>` : ''}
+      <div class="quote" style="margin-top:14px">${esc(quoteOfDay())}</div>
+      <button class="btn primary block" style="margin-top:18px" id="lv-ok">Continuer</button></div>`);
+    $('#lv-ok').onclick = () => { closeSheet(); if (currentTab === 'home') go('home'); };
+  } else if (newBadges.length) {
+    toast(`Trophée débloqué : ${newBadges[0].ico} ${newBadges[0].nom}`, 3500);
+  }
+  if (game.level !== last) await setSetting('lastLevel', game.level);
+  if (newBadges.length) await setSetting('seenBadges', [...lastBadges, ...newBadges.map(b => b.id)]);
+}
+
+function trophiesSheet(game) {
+  const rows = LEVEL_TITLES.map(([n, t]) => `<div class="list-row"><span><b>Niv. ${n}</b> · ${esc(t)}</span><span class="small muted">${xpForLevel(n).toLocaleString('fr-BE')} XP ${game.level >= n ? '✓' : ''}</span></div>`).join('');
+  const st = monStageOf(game.level), path = monPath(game);
+  openSheet(`<h2>Ton compagnon</h2>
+    <div class="muted small">Il évolue avec tes niveaux. Voie actuelle : <b>${path === 'force' ? '⚡ Force (records, semaines complètes)' : '🌊 Technique (jiu-jitsu, journées parfaites)'}</b></div>
+    <div class="evo-grid">${MON_STAGES.map((s, i) => `<div class="evo ${i < st ? '' : i === st ? 'cur' : 'locked'}"><div class="mon-s">${monsterSVG(i, path)}</div><div class="en">${i <= st ? esc(s.nom) : '???'}</div><div class="el">Niv. ${s.lvl}</div></div>`).join('')}</div>
+    <h2 style="margin-top:20px">Trophées & niveaux</h2>
+    <div class="muted small">${game.badges.filter(b => b.ok).length} / ${game.badges.length} trophées · ${game.xp.toLocaleString('fr-BE')} XP</div>
+    <div class="badges">${game.badges.map(b => `<div class="badge ${b.ok ? 'on' : ''}"><div class="bi">${b.ico}</div><div class="bn">${esc(b.nom)}</div><div class="bd">${esc(b.desc)}</div></div>`).join('')}</div>
+    <h3 style="margin-top:18px">Comment gagner des XP</h3>
+    <div class="small muted" style="line-height:1.6">Séance de salle +100 · Jiu-jitsu +80/100 · Marche les jours de repos +40 · Chaque mission +5 à +25 · Journée parfaite +50 · Semaine complète (3 séances) +100 · Record battu +25 · Séance bonus hors planning +60 · Check-in +150</div>
+    <h3 style="margin-top:18px">Les titres</h3>${rows}
+    <div class="sheet-actions"><button class="btn" id="tr-c">Fermer</button></div>`);
+  $('#tr-c').onclick = closeSheet;
+}
+
+function addTaskSheet(k) {
+  openSheet(`<h2>Ajouter une mission</h2>
+    <label>Quoi ?</label><input id="nt-l" placeholder="ex. Acheter du skyr">
+    <label>Quand ?</label><div class="seg" id="nt-s">${SLOTS.map(([v, l], i) => `<button data-v="${v}" class="${i === 0 ? 'on' : ''}">${l}</button>`).join('')}</div>
+    <div class="sheet-actions"><button class="btn ghost" id="nt-c">Annuler</button><button class="btn primary" id="nt-ok">Ajouter (+10 XP)</button></div>`);
+  let slot = 'matin';
+  document.querySelectorAll('#nt-s button').forEach(b => b.onclick = () => { slot = b.dataset.v; document.querySelectorAll('#nt-s button').forEach(x => x.classList.toggle('on', x === b)); });
+  $('#nt-l').focus();
+  $('#nt-c').onclick = closeSheet;
+  $('#nt-ok').onclick = async () => {
+    const label = $('#nt-l').value.trim(); if (!label) return;
+    const rec = await getDayRec(k); rec.custom = rec.custom || []; rec.custom.push({ id: 'c' + uid(), slot, label });
+    await setSetting('day:' + k, rec); closeSheet(); go('home');
+  };
+}
+
+function missionsHTML(st, k) {
+  const main = st.list.find(t => t.slot === 'main');
+  const row = t => `<div class="task ${t.done ? 'done' : ''} ${t.prio === 'haute' ? 'hi' : ''}" data-task="${t.id}">
+      <span class="tick">${t.done ? '✓' : ''}</span>
+      <span class="tl"><span class="tx">${esc(t.label)}</span>${t.hint ? `<span class="th">${esc(t.hint)}</span>` : ''}</span>
+      <span class="xp">${t.autoDone ? 'auto · ' : ''}+${t.xp}</span>
+      ${/^c[0-9a-z]{10,}$/.test(t.id) ? `<button class="rm" data-rm="${t.id}" aria-label="Retirer">×</button>` : ''}</div>`;
+  const total = st.list.length, done = st.doneCount;
+  return `<div class="card missions">
+    <div class="row between"><h2 style="margin:0">Missions du jour</h2><span class="pill">${done}/${total}${st.perfect ? ' · 💯 +50' : ''}</span></div>
+    <div class="bar teal" style="margin-bottom:6px"><i style="width:${total ? done / total * 100 : 0}%"></i></div>
+    ${main ? `<div class="main-mission ${main.done ? 'done' : ''}" data-task="main">
+        <div class="mm-ic">${main.done ? '✓' : '🎯'}</div>
+        <div style="flex:1;min-width:0"><div class="small" style="opacity:.8;font-weight:700">MISSION PRINCIPALE · +${main.xp} XP</div><div class="mm-t">${esc(main.label)}</div>${main.hint ? `<div class="small" style="opacity:.85;margin-top:2px">${esc(main.hint)}</div>` : ''}</div>
+      </div>` : ''}
+    ${SLOTS.map(([s, l]) => { const ts = st.list.filter(t => t.slot === s); return ts.length ? `<div class="slot-h">${l}</div>${ts.map(row).join('')}` : ''; }).join('')}
+    <button class="btn ghost block sm" id="add-task" style="margin-top:10px">+ Ajouter une mission</button>
+  </div>`;
+}
+
 /* ================= ACCUEIL ================= */
 VIEWS.home = async () => {
-  const [meals, workouts, body, goals, program, active] = await Promise.all([
-    dbAll('meals'), dbAll('workouts'), dbAll('body'), getSetting('goals', {}), getSetting('program'), getSetting('activeSession')]);
-  const days = activityDays(meals, workouts, body);
-  const streak = streakOf(days);
+  const [meals, workouts, body, goals, program, active, game] = await Promise.all([
+    dbAll('meals'), dbAll('workouts'), dbAll('body'), getGoals(), getSetting('program'), getSetting('activeSession'), computeGame()]);
   const today = dateKey();
+  const rec = await getDayRec(today);
+  const st = dayStatus(today, rec, game.ix);
+  const days = activityDays(meals, workouts, body);
+  const streak = game.streak;
 
   const ws = weekStart();
   const wsKey = dateKey(ws);
   const weekW = workouts.filter(w => w.date >= wsKey).length;
   const weekTarget = goals.sessionsPerWeek || (program && program.seancesParSemaine) || 3;
-
   const kcalOf = k => meals.filter(m => m.date === k).reduce((a, m) => a + (m.kcal || 0), 0);
-  const kcalToday = kcalOf(today);
   const kcalTarget = goals.kcalTarget || null;
-  const protToday = Math.round(meals.filter(m => m.date === today).reduce((a, m) => a + (m.p || 0), 0));
-  const trainedToday = workouts.some(w => w.date === today);
 
+  // Compte à rebours & phase
+  const ph = phaseOf(today);
+  const jLeft = Math.max(0, daysBetween(today, PROG_END));
+  const totalDays = daysBetween(PROG_START, PROG_END);
+  const elapsed = Math.min(totalDays, Math.max(0, daysBetween(PROG_START, today)));
+  const wk = progWeek(today);
+  const beforeStart = today < PROG_START;
+
+  // Semaine : barres XP par jour + point si séance
+  const L = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  const weekDays = [...Array(7)].map((_, i) => dateKey(addDays(ws, i)));
+  const maxX = Math.max(250, ...weekDays.map(k => game.daysXp[k] || 0));
+  const bars = weekDays.map((k, i) => `<div class="col ${k === today ? 'today' : ''}"><div class="track"><div class="fill" style="height:${(game.daysXp[k] || 0) / maxX * 100}%"></div></div>
+    <div class="dot ${workouts.some(w => w.date === k) ? 'on' : ''}"></div><div class="d">${L[i]}</div></div>`).join('');
+
+  // Objectif : masse grasse (recomposition) + poids
+  const bfSorted = [...body].filter(b => b.bodyfat != null).sort((a, b) => a.date.localeCompare(b.date));
+  const lastBF = bfSorted.length ? bfSorted[bfSorted.length - 1].bodyfat : null;
   const bodySorted = [...body].filter(b => b.weight != null).sort((a, b) => a.date.localeCompare(b.date) || a.ts - b.ts);
   const lastW = bodySorted.length ? bodySorted[bodySorted.length - 1].weight : null;
-  const startW = goals.startWeight ?? (bodySorted[0] && bodySorted[0].weight);
-  const targetW = goals.targetWeight;
-
-  // Progression du jour : repas notés, calories vers le repère, séance de la semaine en cours
-  const parts = [
-    Math.min(1, meals.filter(m => m.date === today).length / 3),
-    kcalTarget ? Math.min(1, kcalToday / kcalTarget) : (kcalToday > 0 ? 1 : 0),
-    trainedToday ? 1 : Math.min(1, weekW / weekTarget),
-  ];
-  const dayPct = Math.round(parts.reduce((a, b) => a + b, 0) / parts.length * 100);
-
-  // Semaine : barres kcal par jour + point si séance
-  const L = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-  const weekDays = [...Array(7)].map((_, i) => addDays(ws, i));
-  const wk = weekDays.map(d => ({ k: dateKey(d), kcal: kcalOf(dateKey(d)), trained: workouts.some(w => w.date === dateKey(d)) }));
-  const maxK = Math.max(kcalTarget || 0, ...wk.map(x => x.kcal), 1);
-  const bars = wk.map((x, i) => `<div class="col ${x.k === today ? 'today' : ''}"><div class="track"><div class="fill" style="height:${Math.max(x.kcal ? 6 : 0, x.kcal / maxK * 100)}%"></div></div>
-    <div class="dot ${x.trained ? 'on' : ''}"></div><div class="d">${L[i]}</div></div>`).join('');
-
   let goalCard = '';
-  if (lastW != null && startW != null && targetW != null && startW !== targetW) {
-    const pct = Math.max(0, Math.min(100, (startW - lastW) / (startW - targetW) * 100));
-    goalCard = `<div class="card blue"><div class="row between"><div><div class="small muted" style="font-weight:600">Objectif ${targetW} kg</div>
-        <div class="gauge-wrap"><div class="gtxt"><div class="big">${Math.round(pct)}%</div><div class="small muted">Encore ${r1(Math.abs(lastW - targetW))} kg · départ ${startW} kg</div>
-        ${goals.targetDate ? `<span class="pill" style="margin-top:8px">⏳ J-${Math.max(0, Math.round((parseKey(goals.targetDate) - parseKey(today)) / 864e5))}</span>` : ''}</div></div></div>
+  if (goals.startBF != null && goals.targetBF != null && lastBF != null) {
+    const pct = Math.max(0, Math.min(100, (goals.startBF - lastBF) / (goals.startBF - goals.targetBF) * 100));
+    goalCard = `<div class="card blue"><div class="row between"><div class="gtxt">
+        <div class="small muted" style="font-weight:600">Objectif masse grasse ${goals.targetBF} %</div>
+        <div class="big" style="font-size:32px;font-weight:800;letter-spacing:-.8px">${Math.round(pct)}%</div>
+        <div class="small muted">Actuel ${r1(lastBF)} % · départ ${goals.startBF} %${lastW != null ? ` · poids ${r1(lastW)} kg` : ''}</div></div>
       ${semiGauge(pct)}</div></div>`;
   }
 
@@ -520,32 +1059,47 @@ VIEWS.home = async () => {
   const hi = hour < 12 ? 'Bonjour' : hour < 18 ? 'Salut' : 'Bonsoir';
   const last7 = [...Array(7)].map((_, i) => addDays(new Date(), i - 6));
   const letters = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+  const lvlPct = (game.xp - game.cur) / (game.next - game.cur) * 100;
+  const monStage = monStageOf(game.level);
+  const yest = dateKey(addDays(new Date(), -1));
+  let monMood = sessionStorage.getItem('monHappy') ? 'happy' : (!(game.daysXp[today] > 0) && !(game.daysXp[yest] > 0) && today > (await getSetting('firstDay', today)) ? 'sleepy' : '');
+  sessionStorage.removeItem('monHappy');
 
   view().innerHTML = `
-    <div class="hello"><div class="h">${hi}${goals.name ? ', ' + esc(goals.name) : ''} 👋</div><div class="s">Prêt à tout donner aujourd'hui ?</div></div>
+    <div class="hello"><div class="h">${hi}${goals.name ? ', ' + esc(goals.name) : ''} 👋</div><div class="s">${beforeStart ? `Ton programme démarre lundi 16 novembre · J-${daysBetween(today, PROG_START)}` : isFestive(today) ? 'Les fêtes : profite, garde juste les protéines et la salle 🎄' : 'Prêt à tout donner aujourd\'hui ?'}</div></div>
 
-    <div class="card">
-      <h2>Progression du jour</h2>
-      <div class="progress-card">
-        ${ring(dayPct, { label: dayPct + '%', sub: "aujourd'hui" })}
-        <div class="legend">
-          <div class="li"><i style="background:var(--teal)"></i><span>Séance</span><b>${trainedToday ? 'faite ✓' : weekW + '/' + weekTarget + ' sem.'}</b></div>
-          <div class="li"><i style="background:var(--peach)"></i><span>Calories</span><b>${Math.round(kcalToday)}${kcalTarget ? ' / ' + kcalTarget : ''}</b></div>
-          <div class="li"><i style="background:#5aa9d6"></i><span>Protéines</span><b>${protToday} g</b></div>
-          <div class="li"><i style="background:#e5b93a"></i><span>Série</span><b>${streak} j</b></div>
+    <div class="card mon-card" id="level-card">
+      <div class="mon-wrap">
+        <div class="mon-stage">${monsterSVG(monStage, monPath(game), monMood)}</div>
+        <div class="mon-info">
+          <div class="mon-name">${esc(MON_STAGES[monStage].nom)}</div>
+          <div class="mon-sub">${esc(game.title)} · ${game.xp.toLocaleString('fr-BE')} XP</div>
+          <div class="mon-lv">Niv. ${game.level} · J-${jLeft}</div>
+          <div class="small" style="opacity:.85;margin-top:6px">${monStage < 5 ? `Évolution au niv. ${MON_STAGES[monStage + 1].lvl}` : 'Forme ultime atteinte 👑'}</div>
         </div>
       </div>
+      <div class="xpbar"><i style="width:${lvlPct}%"></i></div>
+      <div class="row between small" style="opacity:.92;margin-top:10px">
+        <span>${beforeStart ? 'Avant-programme' : wk > 0 && wk <= 17 ? `Semaine ${wk}/17` : 'Programme terminé 🎉'}${ph ? ` · Phase ${ph.n}` : ''}</span>
+        <span>encore ${(game.next - game.xp).toLocaleString('fr-BE')} XP · 🏆 ${game.badges.filter(b => b.ok).length}/${game.badges.length} ›</span>
+      </div>
+      <div class="journey"><i style="width:${elapsed / totalDays * 100}%"></i><span class="flag">🏁</span></div>
+      ${isDeload(today) ? `<div class="small" style="margin-top:8px;font-weight:700">⚡ Semaine allégée : mêmes charges, une série de moins.</div>` : ''}
     </div>
 
     ${active ? `<div class="card mint"><div class="row between"><div><div class="small muted" style="font-weight:600">Séance en cours</div><div style="font-size:19px;font-weight:800;margin-top:2px">${esc(active.name)}</div><div class="small muted">depuis ${esc(active.start)}</div></div>
-        <button class="btn primary" id="resume">Reprendre</button></div></div>`
-    : nextDay ? `<div class="wk-card ${PASTELS[0]}" style="background:var(--teal-soft)">${ART[0]}<div><div class="small muted" style="font-weight:600">Prochaine séance</div><div class="nm">${esc(nextDay.nom)}</div>
-        <div class="meta">${nextDay.exercices.length} exercices</div></div><button class="go" id="startnext">→</button></div>` : ''}
+        <button class="btn primary" id="resume">Reprendre</button></div></div>` : ''}
+
+    ${missionsHTML(st, today)}
 
     <div class="card">
-      <div class="row between"><h2 style="margin:0">Activité de la semaine</h2><span class="small muted">kcal · <b style="color:var(--peach)">●</b> séance</span></div>
+      <div class="row between"><h2 style="margin:0">Ta semaine</h2><span class="small muted">XP gagnés · <b style="color:var(--peach)">●</b> séance</span></div>
       <div class="week-bars">${bars}</div>
+      <div class="row between small muted" style="margin-top:8px"><span>Séances : <b style="color:var(--text)">${weekW}/${weekTarget}</b></span><span>Aujourd'hui : <b style="color:var(--text)">${Math.round(kcalOf(today))}${kcalTarget ? ' / ' + kcalTarget : ''} kcal</b></span></div>
     </div>
+
+    ${ph ? `<div class="card green"><div class="small muted" style="font-weight:700">PHASE ${ph.n} · ${esc(ph.nom.toUpperCase())} · ~${ph.kcal} kcal</div><div style="margin-top:4px;font-weight:600">${esc(ph.conseil)}</div>
+      <div class="small muted" style="margin-top:4px">Jusqu'au ${fmtDay(ph.to)}</div></div>` : ''}
 
     <div class="sec-title"><span>Actions rapides</span></div>
     <div class="qa">
@@ -564,7 +1118,7 @@ VIEWS.home = async () => {
 
     ${goalCard}
 
-    ${weightPts.length >= 2 ? `<div class="card"><h2>Évolution du poids</h2>${lineChart(weightPts, { target: targetW ?? null, unit: ' kg' })}</div>` : ''}
+    ${weightPts.length >= 2 ? `<div class="card"><h2>Évolution du poids</h2>${lineChart(weightPts, { target: goals.targetWeight ?? null, unit: ' kg' })}</div>` : ''}
 
     <div class="card yellow"><h2>Records personnels 🏆</h2>
       ${recs.length ? recs.map(r => `<div class="list-row"><span style="font-weight:600">${esc(r.name)}</span><span class="pr">${r.weight} kg × ${r.reps}</span></div>`).join('')
@@ -572,11 +1126,27 @@ VIEWS.home = async () => {
     </div>
   `;
   const rs = $('#resume'); if (rs) rs.onclick = () => go('train');
-  const sn = $('#startnext'); if (sn) sn.onclick = async () => { await startSession(nextDay); go('train'); };
+  $('#level-card').onclick = () => trophiesSheet(game);
   $('#qa-train').onclick = async () => { if (!active && nextDay) await startSession(nextDay); go('train'); };
   $('#qa-food').onclick = () => quickMealPhoto();
   $('#qa-body').onclick = () => go('body');
   $('#qa-chat').onclick = () => { mealsMode = 'chat'; go('meals'); };
+  $('#add-task').onclick = () => addTaskSheet(today);
+  view().querySelectorAll('[data-rm]').forEach(b => b.onclick = async e => {
+    e.stopPropagation();
+    const r = await getDayRec(today); r.custom = (r.custom || []).filter(c => c.id !== b.dataset.rm); delete r.done[b.dataset.rm];
+    await setSetting('day:' + today, r); go('home');
+  });
+  view().querySelectorAll('[data-task]').forEach(el => el.onclick = async () => {
+    const t = st.list.find(x => x.id === el.dataset.task); if (!t) return;
+    const seance = PROGRAMME_SB.jours.find(j => j.jourSemaine === parseKey(today).getDay());
+    if (t.id === 'main' && seance && !t.done && today >= PROG_START && today <= PROG_END) {
+      if (!active) await startSession(program && program.jours ? (program.jours.find(j => j.nom === seance.nom) || seance) : seance);
+      go('train'); return;
+    }
+    await toggleTask(today, t); go('home');
+  });
+  checkLevelUp(game);
 };
 
 async function quickMealPhoto() {
@@ -586,6 +1156,14 @@ async function quickMealPhoto() {
 
 async function suggestNextDay(program, workouts) {
   if (!program || !program.jours || !program.jours.length) return null;
+  if (program.jours.some(j => j.jourSemaine != null)) {
+    // Séance prévue aujourd'hui, sinon la prochaine dans la semaine
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(new Date(), i), wd = d.getDay();
+      const j = program.jours.find(x => x.jourSemaine === wd);
+      if (j && !(i === 0 && workouts.some(w => w.date === dateKey()))) return j;
+    }
+  }
   const last = [...workouts].filter(w => w.programDay != null).sort((a, b) => b.ts - a.ts)[0];
   const idx = last ? (program.jours.findIndex(j => j.nom === last.programDay) + 1) % program.jours.length : 0;
   return program.jours[Math.max(0, idx)];
@@ -619,7 +1197,7 @@ function bindSeg() {
 }
 
 async function renderJournal() {
-  const [meals, goals] = await Promise.all([dbAll('meals'), getSetting('goals', {})]);
+  const [meals, goals] = await Promise.all([dbAll('meals'), getGoals()]);
   meals.sort((a, b) => b.date.localeCompare(a.date) || (b.time || '').localeCompare(a.time || '') || b.ts - a.ts);
   const byDay = {};
   meals.forEach(m => (byDay[m.date] = byDay[m.date] || []).push(m));
@@ -678,7 +1256,7 @@ async function renderChat() {
   const mealById = Object.fromEntries(meals.map(m => [m.id, m]));
   const today = dateKey();
   const kcalToday = meals.filter(m => m.date === today).reduce((a, m) => a + (m.kcal || 0), 0);
-  const goals = await getSetting('goals', {});
+  const goals = await getGoals();
 
   const bubbles = msgs.slice(-80).map(m => {
     const meal = m.mealId && mealById[m.mealId];
@@ -749,7 +1327,7 @@ async function blobToBase64Jpeg(blob, max = 1024) {
 }
 
 async function buildSystemPrompt() {
-  const [goals, meals, body, extra] = await Promise.all([getSetting('goals', {}), dbAll('meals'), dbAll('body'), getSetting('nutritionContext', '')]);
+  const [goals, meals, body, extra] = await Promise.all([getGoals(), dbAll('meals'), dbAll('body'), getSetting('nutritionContext', '')]);
   const today = dateKey();
   const todays = meals.filter(m => m.date === today).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
   const tot = k => Math.round(todays.reduce((a, m) => a + (m[k] || 0), 0));
@@ -765,6 +1343,7 @@ IMPORTANT — enregistrement au journal : chaque fois qu'il te signale un repas 
 Il peut aussi te poser des questions (quoi manger ce soir, collations riches en protéines, etc.) : réponds en tenant compte de sa journée et de ses objectifs.
 
 Contexte (date : ${today}, heure : ${timeNow()}) :
+- Phase du programme : ${phaseOf(today) ? `${phaseOf(today).n} (${phaseOf(today).nom})` : today < PROG_START ? 'avant le démarrage (16 nov.)' : 'hors programme'}${isFestive(today) ? ' — période des fêtes : profiter sans culpabiliser' : ''}.
 - Objectifs : ${goals.kcalTarget ? `environ ${goals.kcalTarget} kcal/jour` : 'repère calorique non défini'}${goals.targetWeight ? `, poids visé ${goals.targetWeight} kg` : ''}${goals.targetDate ? ` pour le ${goals.targetDate}` : ''}.
 - Poids actuel : ${lastW ? lastW.weight + ' kg (' + lastW.date + ')' : 'inconnu'}.
 - Déjà mangé aujourd'hui : ${todays.length ? todays.map(m => `${m.time || '?'} ${m.desc || 'repas'} (~${Math.round(m.kcal || 0)} kcal)`).join(' ; ') : 'rien encore'}. Total ≈ ${tot('kcal')} kcal, P ${tot('p')} g, G ${tot('g')} g, L ${tot('l')} g.
@@ -973,10 +1552,12 @@ async function startSession(day) {
   const s = {
     id: uid(), date: dateKey(), start: timeNow(), ts: Date.now(),
     name: day ? day.nom : 'Séance libre', programDay: day ? day.nom : null,
-    exercises: day ? day.exercices.map(e => ({
-      name: e.nom, target: e.reps ? `${e.series || ''}×${e.reps}` : '', rest: e.repos || 90, tip: e.conseil || '',
-      sets: [...Array(Math.max(1, e.series || 3))].map((_, i) => prefillSet(workouts, e.nom, i)),
-    })) : [],
+    deload: isDeload(dateKey()), technique: progWeek(dateKey()) >= 1 && progWeek(dateKey()) <= 2,
+    exercises: day ? day.exercices.map(e => {
+      const series = Math.max(1, (e.series || 3) - (isDeload(dateKey()) ? 1 : 0));
+      return { name: e.nom, target: e.reps ? `${series}×${e.reps}` : '', rest: e.repos || 90, tip: e.conseil || '',
+        sets: [...Array(series)].map((_, i) => prefillSet(workouts, e.nom, i)) };
+    }) : [],
   };
   await setSetting('activeSession', s);
   return s;
@@ -1006,13 +1587,15 @@ VIEWS.train = async () => {
   const ws = dateKey(weekStart());
   const weekW = workouts.filter(w => w.date >= ws).length;
   view().innerHTML = `
-    <div class="hello"><div class="h">Séances</div><div class="s">${weekW} séance${weekW > 1 ? 's' : ''} cette semaine · ${workouts.length} au total</div></div>
+    <div class="hello"><div class="h">Séances</div><div class="s">${weekW} séance${weekW > 1 ? 's' : ''} cette semaine · ${workouts.length} au total${progWeek(dateKey()) ? ` · semaine ${progWeek(dateKey())}/17` : ''}</div></div>
+    ${isDeload(dateKey()) ? `<div class="card green small"><b>Semaine allégée (11–17 janv.)</b> : mêmes charges, une série de moins. Déjà appliqué dans tes séances.</div>` : ''}
+    <div class="card small"><b>Comment progresser :</b> quand tu fais le haut de la fourchette sur toutes les séries, augmente la charge la fois suivante (+2,5 kg jambes et dos, +1 à 2 kg le reste). Garde toujours 1 à 2 répétitions en réserve.</div>
     ${program && program.jours && program.jours.length ? `
       <div class="sec-title"><span>${esc(program.nom || 'Mon programme')}</span></div>
       ${program.description ? `<div class="small muted" style="margin:0 4px">${esc(program.description)}</div>` : ''}
       ${program.jours.map((j, i) => `<div class="wk-card" style="background:${BG[i % BG.length]}">${ART[i % ART.length]}
           ${next && next.nom === j.nom ? '<span class="pill tag">Prochaine</span>' : ''}
-          <div><div class="nm">${esc(j.nom)}</div><div class="meta">${j.exercices.length} exercices · ${j.exercices.slice(0, 3).map(e => esc(e.nom)).join(', ')}${j.exercices.length > 3 ? '…' : ''}</div></div>
+          <div>${j.jourSemaine != null ? `<div class="small" style="font-weight:700;opacity:.65">${['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][j.jourSemaine]}${j.jourSemaine === new Date().getDay() ? ' · AUJOURD\'HUI' : ''}</div>` : ''}<div class="nm">${esc(j.nom)}</div><div class="meta">${j.exercices.length} exercices · ${j.exercices.slice(0, 3).map(e => esc(e.nom)).join(', ')}${j.exercices.length > 3 ? '…' : ''}</div></div>
           <button class="go" data-day="${i}" aria-label="Commencer">→</button></div>`).join('')}` : `
       <div class="wk-card" style="background:var(--teal-soft)">${ART[0]}<div><div class="nm">Ton programme arrive</div>
         <div class="meta">Il sera créé sur mesure après l'analyse de ton corps, puis importé dans Profil → Programme.</div></div></div>`}
@@ -1056,7 +1639,12 @@ async function renderSession(s) {
     <div id="timer-slot"></div>
     <div class="row between" style="margin:8px 2px"><div><h2 style="margin:0">${esc(s.name)}</h2><div class="small muted">Commencée à ${esc(s.start)}</div></div>
       <button class="btn sm ghost" id="s-cancel">Abandonner</button></div>
+    ${s.programDay ? `<details class="card warmup" ${s.exercises.some(e => e.sets.some(x => x.done)) ? '' : 'open'}><summary><b>🔥 Échauffement (8 min)</b></summary>
+      <ol class="small" style="margin:8px 0 0;padding-left:18px;line-height:1.6">${WARMUP.map(w => `<li>${esc(w)}</li>`).join('')}</ol></details>` : ''}
+    ${s.technique ? `<div class="card yellow small"><b>Semaines 1–2 : la technique avant la charge.</b> Charges légères, 3 répétitions en réserve.</div>` : ''}
+    ${s.deload ? `<div class="card green small"><b>Semaine allégée.</b> Mêmes charges, une série de moins par exercice.</div>` : ''}
     <div id="ex-list">${s.exercises.map((e, ei) => exHTML(e, ei, workouts)).join('')}</div>
+    <div class="small muted" style="margin:8px 4px">Forme du jour : moins de 6 h de sommeil, JJB très dur ou une douleur ? Enlève une série par exercice, sans baisser la charge. Douleur articulaire vive : arrête l'exercice.</div>
     <button class="btn block" id="s-addex" style="margin-top:6px">+ Ajouter un exercice</button>
     <label>Notes de séance</label><textarea id="s-notes" placeholder="Sensations, douleurs, énergie...">${esc(s.notes || '')}</textarea>
     <button class="btn primary block" id="s-finish" style="margin-top:14px">Terminer la séance ✓</button>`;
@@ -1120,6 +1708,7 @@ async function renderSession(s) {
       <div class="quote" style="margin-top:14px">${esc(quoteOfDay())}</div>
       <button class="btn primary block" style="margin-top:18px" id="fin-ok">Retour</button></div>`);
     $('#fin-ok').onclick = () => { closeSheet(); go('home'); };
+    toast('+100 XP 💪', 2500);
   };
 }
 
@@ -1155,54 +1744,83 @@ function renderTimer() {
 }
 
 /* ================= CORPS ================= */
+// Champs de la balance Basic-Fit (remplis seulement ce que l'écran affiche) + tour de taille + InBody.
 const BODY_FIELDS = [
-  ['weight', 'Poids', 'kg'], ['bodyfat', 'Masse grasse', '%'], ['waist', 'Tour de taille', 'cm'], ['chest', 'Poitrine', 'cm'],
-  ['hips', 'Hanches', 'cm'], ['arm', 'Bras', 'cm'], ['thigh', 'Cuisse', 'cm'], ['neck', 'Cou', 'cm'],
+  ['weight', 'Poids', 'kg'], ['bodyfat', 'Masse grasse', '%'], ['leanpct', 'Masse musculaire', '%'], ['water', 'Eau', '%'],
+  ['visceral', 'Graisse viscérale', 'indice'], ['bmr', 'Métabolisme de base', 'kcal'], ['waist', 'Tour de taille (nombril)', 'cm'], ['muscle', 'Muscle squelettique (InBody)', 'kg'],
 ];
+const SOURCES = ['Basic-Fit', 'InBody', 'Autre'];
+
+function weeklyAverages(body) {
+  const w = {};
+  body.filter(b => b.weight != null).forEach(b => { const k = dateKey(weekStart(parseKey(b.date))); (w[k] = w[k] || []).push(b.weight); });
+  return Object.entries(w).sort((a, b) => b[0].localeCompare(a[0])).map(([k, v]) => ({ week: k, avg: v.reduce((a, b) => a + b, 0) / v.length, n: v.length }));
+}
 
 VIEWS.body = async () => {
-  const [body, goals] = await Promise.all([dbAll('body'), getSetting('goals', {})]);
+  const [body, goals] = await Promise.all([dbAll('body'), getGoals()]);
   body.sort((a, b) => b.date.localeCompare(a.date) || b.ts - a.ts);
-  const asc = [...body].reverse();
-  const last = body[0];
-  const first = asc[0];
+  const src = b => b.source || 'Basic-Fit';
+  const bf = body.filter(b => src(b) === 'Basic-Fit');
+  const asc = [...body].reverse(), bfAsc = [...bf].reverse();
+  const last = bf[0] || body[0];
+  const first = bfAsc[0];
   const wPts = asc.filter(b => b.weight != null).map(b => ({ x: b.date, y: b.weight }));
+  const fatPts = bfAsc.filter(b => b.bodyfat != null).map(b => ({ x: b.date, y: b.bodyfat }));
   const waistPts = asc.filter(b => b.waist != null).map(b => ({ x: b.date, y: b.waist }));
-  const photos = body.filter(b => b.photo).slice(0, 9);
+  const photos = body.filter(b => b.photo).slice(0, 12);
+  const avgs = weeklyAverages(body).slice(0, 6);
+  const nextCheck = CHECKINS.find(c => c >= dateKey());
 
-  view().innerHTML = `<div class="hello"><div class="h">Corps</div><div class="s">${body.length} mesure${body.length > 1 ? 's' : ''} enregistrée${body.length > 1 ? 's' : ''}</div></div>` + (body.length ? `
-    <div class="card"><h2>Dernière mesure · ${fmtDay(last.date)}</h2>
-      <div class="grid3">${BODY_FIELDS.filter(([k]) => last[k] != null).map(([k, l, u]) => {
+  view().innerHTML = `<div class="hello"><div class="h">Corps</div><div class="s">${body.length} mesure${body.length > 1 ? 's' : ''} · balance Basic-Fit</div></div>` +
+    (nextCheck ? `<div class="card peach small"><b>📸 Prochain check-in : ${fmtDay(nextCheck)}</b> (J-${daysBetween(dateKey(), nextCheck)})<br>Balance Basic-Fit avant la séance, tour de taille au nombril, photos face/profil/dos au même endroit et même lumière.</div>` : '') +
+    (body.length ? `
+    <div class="card"><h2>Dernière mesure ${last ? '· ' + fmtDay(last.date) : ''}</h2>
+      ${last ? `<div class="small muted" style="margin:-6px 0 10px">${esc(src(last))}${last.note ? ' · ' + esc(last.note) : ''}</div>` : ''}
+      <div class="grid3">${last ? BODY_FIELDS.filter(([k]) => last[k] != null).map(([k, l, u]) => {
         const d = first && first !== last && first[k] != null ? r1(last[k] - first[k]) : null;
-        return `<div class="stat"><div class="v">${r1(last[k])}<span class="muted" style="font-size:12px"> ${u}</span></div><div class="l">${l}${d ? ` <span style="color:${d < 0 ? 'var(--good)' : 'var(--accent2)'}">${d > 0 ? '+' : ''}${d}</span>` : ''}</div></div>`;
-      }).join('')}</div></div>
+        const good = k === 'leanpct' || k === 'muscle' || k === 'water' ? d > 0 : d < 0;
+        return `<div class="stat"><div class="v">${r1(last[k])}<span class="muted" style="font-size:12px"> ${u === 'indice' ? '' : u}</span></div><div class="l">${l}${d ? ` <span style="color:${good ? 'var(--good)' : 'var(--accent2)'}">${d > 0 ? '+' : ''}${d}</span>` : ''}</div></div>`;
+      }).join('') : ''}</div>
+      <div class="small muted" style="margin-top:10px">Écarts calculés depuis ta 1re mesure Basic-Fit. Ne compare pas Basic-Fit et InBody entre eux : ce sont deux appareils différents.</div></div>
+
+    ${avgs.length ? `<div class="card"><h2>Moyenne de poids par semaine</h2>
+      ${avgs.map((w, i) => { const prev = avgs[i + 1]; const d = prev ? r1(w.avg - prev.avg) : null;
+        return `<div class="list-row"><span>Semaine du ${fmtShort(w.week)} <span class="small muted">(${w.n} pesée${w.n > 1 ? 's' : ''})</span></span><span><b>${r1(w.avg)} kg</b>${d != null ? ` <span class="small" style="color:${d <= 0 ? 'var(--good)' : 'var(--accent2)'}">${d > 0 ? '+' : ''}${d}</span>` : ''}</span></div>`; }).join('')}
+      <div class="small muted" style="margin-top:8px">En phase 2, vise −0,25 à −0,5 kg par semaine. Si la moyenne stagne 2 semaines, enlève une portion de féculents par jour.</div></div>` : ''}
+
     <div class="card"><h2>Poids</h2>${lineChart(wPts, { target: goals.targetWeight ?? null, unit: ' kg' })}</div>
+    ${fatPts.length >= 2 ? `<div class="card"><h2>Masse grasse (Basic-Fit)</h2>${lineChart(fatPts, { target: goals.targetBF ?? null, unit: ' %' })}</div>` : ''}
     ${waistPts.length >= 2 ? `<div class="card"><h2>Tour de taille</h2>${lineChart(waistPts, { unit: ' cm' })}</div>` : ''}
     ${photos.length ? `<div class="card"><h2>Photos de progression</h2><div class="grid3">${photos.map(b => `<div><img src="${blobURL(b.photo)}" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px" alt=""><div class="small muted" style="text-align:center">${fmtShort(b.date)}</div></div>`).join('')}</div></div>` : ''}
-    <div class="card"><h2>Historique</h2><table><tr><th>Date</th><th>Poids</th><th>Taille</th><th>MG %</th></tr>
-      ${body.map(b => `<tr class="brow" data-id="${b.id}"><td>${fmtShort(b.date)}</td><td>${b.weight != null ? r1(b.weight) : "—"}</td><td>${b.waist != null ? r1(b.waist) : "—"}</td><td>${b.bodyfat != null ? r1(b.bodyfat) : "—"}</td></tr>`).join('')}</table></div>`
-    : `<div class="empty"><div class="big">📏</div>Aucune mesure pour l'instant.<br>Appuie sur <b>+</b> pour noter ton poids et tes mensurations.</div>`);
+    <div class="card"><h2>Historique</h2><table><tr><th>Date</th><th>Source</th><th>Poids</th><th>MG %</th></tr>
+      ${body.map(b => `<tr class="brow" data-id="${b.id}"><td>${fmtShort(b.date)}</td><td class="small">${esc(src(b))}</td><td>${b.weight != null ? r1(b.weight) : "—"}</td><td>${b.bodyfat != null ? r1(b.bodyfat) : "—"}</td></tr>`).join('')}</table></div>`
+    : `<div class="empty"><div class="big">📏</div>Aucune mesure pour l'instant.<br>Appuie sur <b>+</b> après ta pesée Basic-Fit.</div>`);
   view().querySelectorAll('.brow').forEach(r => r.onclick = () => bodySheet(body.find(b => b.id === r.dataset.id)));
   addFab(() => bodySheet(null));
 };
 
 function bodySheet(entry) {
   const isNew = !entry;
-  const b = entry ? { ...entry } : { id: uid(), date: dateKey(), ts: Date.now() };
+  const b = entry ? { ...entry } : { id: uid(), date: dateKey(), ts: Date.now(), source: 'Basic-Fit' };
   let photo = b.photo || null;
+  let source = b.source || 'Basic-Fit';
   openSheet(`<h2>${isNew ? 'Nouvelle mesure' : 'Mesure'}</h2>
+    <div class="small muted">Recopie ce qu'affiche la balance Basic-Fit. Laisse vide ce qu'elle ne donne pas.</div>
+    <label>Source</label><div class="seg" id="b-src">${SOURCES.map(s => `<button data-v="${s}" class="${s === source ? 'on' : ''}">${s}</button>`).join('')}</div>
     <label>Date</label><input type="date" id="b-date" value="${b.date}">
-    <div class="grid2">${BODY_FIELDS.map(([k, l, u]) => `<div><label>${l} (${u})</label><input id="b-${k}" inputmode="decimal" value="${b[k] ?? ''}"></div>`).join('')}</div>
-    <label>Note</label><input id="b-note" value="${esc(b.note || '')}" placeholder="à jeun, après séance...">
+    <div class="grid2">${BODY_FIELDS.map(([k, l, u]) => `<div><label>${l}${u === 'indice' ? '' : ` (${u})`}</label><input id="b-${k}" inputmode="decimal" value="${b[k] ?? ''}"></div>`).join('')}</div>
+    <label>Note</label><input id="b-note" value="${esc(b.note || '')}" placeholder="ex. avant la séance, après le repas...">
     <input type="file" id="b-file" accept="image/*" capture="environment" hidden>
     <img id="b-prev" class="photo-preview" ${photo ? `src="${blobURL(photo)}"` : 'hidden'} alt="">
-    <button class="btn block" id="b-cam" style="margin-top:10px">📷 Photo de progression (facultatif)</button>
+    <button class="btn block" id="b-cam" style="margin-top:10px">📷 Photo de progression (ou de l'écran de la balance)</button>
     <div class="sheet-actions">${isNew ? `<button class="btn ghost" id="b-cancel">Annuler</button>` : `<button class="btn danger" id="b-del">Supprimer</button>`}
       <button class="btn primary" id="b-save">Enregistrer</button></div>`);
+  document.querySelectorAll('#b-src button').forEach(x => x.onclick = () => { source = x.dataset.v; document.querySelectorAll('#b-src button').forEach(y => y.classList.toggle('on', y === x)); });
   $('#b-cam').onclick = () => $('#b-file').click();
   $('#b-file').onchange = async () => { const f = $('#b-file').files[0]; if (!f) return; photo = await resizeImage(f); const p = $('#b-prev'); p.src = blobURL(photo); p.hidden = false; };
   $('#b-save').onclick = async () => {
-    b.date = $('#b-date').value || dateKey();
+    b.date = $('#b-date').value || dateKey(); b.source = source;
     BODY_FIELDS.forEach(([k]) => { b[k] = num($('#b-' + k).value); });
     b.note = $('#b-note').value.trim(); b.photo = photo;
     if (BODY_FIELDS.every(([k]) => b[k] == null) && !photo) { toast('Entre au moins une valeur.'); return; }
@@ -1254,7 +1872,9 @@ VIEWS.settings = async () => {
         <div><label>Poids objectif (kg)</label><input id="g-target" inputmode="decimal" value="${goals.targetWeight ?? ''}"></div>
         <div><label>Date objectif</label><input id="g-date" type="date" value="${goals.targetDate || ''}"></div>
         <div><label>Séances / semaine</label><input id="g-spw" inputmode="numeric" value="${goals.sessionsPerWeek ?? ''}"></div>
-        <div><label>kcal / jour (repère)</label><input id="g-kcal" inputmode="numeric" value="${goals.kcalTarget ?? ''}"></div>
+        <div><label>kcal / jour (repère)</label><input id="g-kcal" inputmode="numeric" value="${goals.kcalTarget ?? ''}" placeholder="auto (selon la phase)"></div>
+        <div><label>Masse grasse départ (%)</label><input id="g-sbf" inputmode="decimal" value="${goals.startBF ?? ''}"></div>
+        <div><label>Masse grasse objectif (%)</label><input id="g-tbf" inputmode="decimal" value="${goals.targetBF ?? ''}"></div>
       </div>
       <button class="btn primary block" id="g-save" style="margin-top:14px">Enregistrer les objectifs</button>
     </div>
@@ -1277,6 +1897,7 @@ VIEWS.settings = async () => {
       <textarea id="p-json" placeholder="Colle ici le programme donné par Claude" style="min-height:120px;font-family:monospace;font-size:13px"></textarea>
       <div class="row" style="margin-top:10px"><button class="btn primary" id="p-import" style="flex:1">Importer</button>
         ${program ? `<button class="btn ghost" id="p-show">Voir</button><button class="btn danger" id="p-del">Retirer</button>` : ''}</div>
+      <button class="btn ghost block sm" id="p-reset" style="margin-top:10px">Recharger le programme Summer Body d'origine</button>
       <details style="margin-top:10px"><summary class="small muted">Voir le format attendu</summary><pre class="code">${esc(PROGRAM_EXAMPLE)}</pre></details>
     </div>
 
@@ -1293,7 +1914,7 @@ VIEWS.settings = async () => {
 
   $('#g-save').onclick = async () => {
     const g = { name: $('#g-name').value.trim(), startWeight: num($('#g-start').value), targetWeight: num($('#g-target').value),
-      targetDate: $('#g-date').value || null, sessionsPerWeek: num($('#g-spw').value), kcalTarget: num($('#g-kcal').value) };
+      targetDate: $('#g-date').value || null, sessionsPerWeek: num($('#g-spw').value), kcalTarget: num($('#g-kcal').value), startBF: num($('#g-sbf').value), targetBF: num($('#g-tbf').value) };
     await setSetting('goals', g); if (g.name) $('#avatar').textContent = g.name[0].toUpperCase(); toast('Objectifs enregistrés ✓');
   };
   const saveKey = async () => {
@@ -1330,6 +1951,7 @@ VIEWS.settings = async () => {
     $('#p-show').onclick = () => { openSheet(`<h2>${esc(program.nom || 'Programme')}</h2><pre class="code">${esc(JSON.stringify(program, null, 2))}</pre><div class="sheet-actions"><button class="btn" id="ps-c">Fermer</button></div>`); $('#ps-c').onclick = closeSheet; };
     $('#p-del').onclick = async () => { if (await confirmSheet('Retirer le programme actuel ? (ton historique reste)', 'Retirer')) { await setSetting('program', null); go('settings'); } };
   }
+  $('#p-reset').onclick = async () => { if (await confirmSheet('Recharger le programme Summer Body et ses objectifs d\'origine ?', 'Recharger', false)) { await seedProgramme(true); toast('Programme Summer Body rechargé ✓'); go('settings'); } };
   $('#bk-exp').onclick = exportBackup;
   $('#bk-imp').onclick = () => $('#bk-file').click();
   $('#bk-file').onchange = async () => { const f = $('#bk-file').files[0]; if (f) await importBackup(f); };
@@ -1388,6 +2010,7 @@ async function importBackup(file) {
   $('#quick-cam').onclick = () => quickMealPhoto();
   $('#date-label').textContent = new Date().toLocaleDateString('fr-BE', { weekday: 'long', day: 'numeric', month: 'long' });
   await openDB();
+  try { await seedProgramme(); } catch (e) { console.error(e); }
   try { if (navigator.storage && navigator.storage.persist && !(await navigator.storage.persisted())) navigator.storage.persist(); } catch { }
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => { });
   go('home');
