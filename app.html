@@ -347,6 +347,21 @@ html,body{overflow-x:clip}
 .cal-legend .lg{display:inline-block;width:10px;height:10px;border-radius:4px;margin-right:4px;vertical-align:-1px}
 .lg.gym{background:var(--teal-soft);box-shadow:inset 0 0 0 1px var(--teal)}.lg.jjb{background:var(--lilac-soft);box-shadow:inset 0 0 0 1px #7b5ce0}.lg.rest{background:#f1f3f2;box-shadow:inset 0 0 0 1px #ccc}.lg.done{background:var(--teal)}
 
+/* v2.3 : charge suggérée, bilan, comparateur */
+.sugg{display:flex;align-items:center;gap:8px;justify-content:space-between;background:var(--teal-soft);border-radius:12px;padding:8px 10px;margin-top:8px;font-size:13px;font-weight:600}
+.sugg.up{background:#ffe8d9}
+.sugg .btn{flex:none}
+.rp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.rp-grid>div{background:rgba(255,255,255,.75);border-radius:14px;padding:10px 6px;text-align:center;display:flex;flex-direction:column}
+.rp-grid b{font-size:18px;font-weight:800}
+.rp-grid span{font-size:11px;color:var(--muted)}
+.report{background:linear-gradient(135deg,#eaf7f2,#fdf0e7)}
+.cmp{position:relative;width:100%;aspect-ratio:3/4;border-radius:18px;overflow:hidden;margin-top:12px;background:#eef3f1}
+.cmp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cmp-line{position:absolute;top:0;bottom:0;width:3px;margin-left:-1px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.35)}
+.cmp-tag{position:absolute;top:10px;background:rgba(0,0,0,.55);color:#fff;font-size:12px;font-weight:700;padding:4px 8px;border-radius:10px}
+.cmp-tag.l{left:10px}.cmp-tag.r{right:10px}
+
 </style>
 </head>
 <body>
@@ -376,7 +391,7 @@ html,body{overflow-x:clip}
 'use strict';
 /* Summer Body — appli de suivi 100 % locale (IndexedDB). Aucune donnée ne quitte le téléphone. */
 
-const APP_VERSION = '2.2.0';
+const APP_VERSION = '2.3.0';
 
 /* ---------------- Base de données locale ---------------- */
 const DB_NAME = 'summerbody';
@@ -703,7 +718,7 @@ async function prefetchDemos() {
   } catch { }
 }
 
-const NUTRI_CONTEXT_SB = `Programme Summer Body (16 nov. 2026 → 10 mars 2027). Départ InBody 20/09 : 72,7 kg, 20,4 % de masse grasse, 32,9 kg de muscle squelettique, gras surtout au tronc (7,6 kg, 185 % de la norme), graisse viscérale 56,7 cm² (sain). Basic-Fit 13/11 : 73,3 kg, 19 % de masse grasse. Il se mesure désormais uniquement sur la balance Basic-Fit. Objectif : 13–15 % de masse grasse, +1,5 à 2,5 kg de muscle, poids ~70–71 kg (recomposition). Entraînement : salle lundi/jeudi/samedi, jiu-jitsu mercredi (1 h) et dimanche (2 h), 8 000–10 000 pas/jour. Il mange les repas de ses parents : il ne contrôle pas les recettes, il joue sur les portions et les ajouts. Protéines : ~140 g/jour (portion de viande/poisson/œufs grande comme la main à chaque repas + 1–2 boosters : skyr 250 g, 3 œufs, thon, whey). Assiette : ½ légumes, ¼ protéines, ¼ féculents ; pas de 2e assiette de féculents sauf après le jiu-jitsu du dimanche. Pain 1–2 morceaux max, moins de sauce/huile, uniquement eau/thé/café sans sucre, grignotages remplacés par fruit/skyr/amandes. Calories : phase 1 (16 nov.–13 déc.) maintenance ~2 600 ; phase 2 (14 déc.–21 fév.) ~2 300 ; phase 3 (22 fév.–10 mars) ~2 100–2 200. Fêtes 24 déc.–1er janv. : profiter sans culpabiliser, garder protéines et salle.`;
+const NUTRI_CONTEXT_SB = `Programme Summer Body (16 nov. 2026 → 10 mars 2027). Objectif : recomposition (perdre du gras, garder/gagner du muscle). Entraînement : salle lundi/jeudi/samedi, jiu-jitsu mercredi (1 h) et dimanche (2 h), 8 000–10 000 pas/jour. Protéines : ~140 g/jour (portion de viande/poisson/œufs grande comme la main à chaque repas + 1–2 boosters : skyr, œufs, thon, whey). Assiette : ½ légumes, ¼ protéines, ¼ féculents. Boissons sans sucre. Calories : phase 1 (16 nov.–13 déc.) ~2 600 ; phase 2 (14 déc.–21 fév.) ~2 300 ; phase 3 (22 fév.–10 mars) ~2 100–2 200. Fêtes 24 déc.–1er janv. : profiter sans culpabiliser, garder protéines et salle.`;
 
 const daysBetween = (a, b) => Math.round((parseKey(b) - parseKey(a)) / 864e5);
 const inRange = (k, a, b) => k >= a && k <= b;
@@ -727,14 +742,9 @@ async function seedProgramme(force = false) {
   if (force || !prog || !String(prog.id || '').startsWith('summerbody-2027')) await setSetting('program', PROGRAMME_SB);
   else if (prog.id !== PROGRAMME_SB.id) await setSetting('program', PROGRAMME_SB);
   const g = await getSetting('goals', {});
-  await setSetting('goals', { name: 'Hicham', startWeight: 73.3, targetWeight: 70.5, startBF: 19, targetBF: 14,
-    targetDate: PROG_END, sessionsPerWeek: 3, kcalTarget: null, ...(force ? {} : g) });
+  await setSetting('goals', { targetDate: PROG_END, sessionsPerWeek: 3, kcalTarget: null, ...(force ? {} : g) });
   if (force || !(await getSetting('nutritionContext', ''))) await setSetting('nutritionContext', NUTRI_CONTEXT_SB);
-  const body = await dbAll('body');
-  if (!body.some(b => b.id === 'inbody-2026-09-20'))
-    await dbPut('body', { id: 'inbody-2026-09-20', date: '2026-09-20', ts: Date.parse('2026-09-20T08:00:00'), source: 'InBody', weight: 72.7, bodyfat: 20.4, muscle: 32.9, note: 'InBody de départ · gras du tronc 7,6 kg · viscéral 56,7 cm²' });
-  if (!body.some(b => b.id === 'basicfit-2026-11-13'))
-    await dbPut('body', { id: 'basicfit-2026-11-13', date: '2026-11-13', ts: Date.parse('2026-11-13T08:00:00'), source: 'Basic-Fit', weight: 73.3, bodyfat: 19, leanpct: 77, note: 'Basic-Fit de départ' });
+  // Les mesures personnelles ne sont plus dans le code public : elles s'importent avec le « pack de départ » (Profil → Importer).
   if (!(await getSetting('firstDay'))) await setSetting('firstDay', dateKey());
   await setSetting('seed_sb_v2', true);
 }
@@ -1121,6 +1131,47 @@ function missionsHTML(st, k) {
 }
 
 /* ================= ACCUEIL ================= */
+/* ---------------- Bilan de la semaine (dimanche soir + lundi) ---------------- */
+async function weeklyReportCard(game, workouts, body) {
+  const now = new Date(); const dow = now.getDay();
+  if (!(dow === 0 && now.getHours() >= 16) && dow !== 1) return '';
+  const ws = dow === 1 ? addDays(weekStart(), -7) : weekStart();
+  const wk = dateKey(ws);
+  if (wk < PROG_START || (await getSetting('reportSeen')) === wk) return '';
+  const days = [...Array(7)].map((_, i) => dateKey(addDays(ws, i)));
+  const inW = w => days.includes(w.date);
+  const gym = workouts.filter(w => inW(w) && isGym(w)).length, jjb = workouts.filter(w => inW(w) && !isGym(w)).length;
+  const prot = days.map(k => (game.ix[k] || {}).prot || 0).filter(v => v > 0);
+  const protAvg = prot.length ? Math.round(prot.reduce((a, b) => a + b, 0) / prot.length) : null;
+  const xp = days.reduce((a, k) => a + (game.daysXp[k] || 0), 0);
+  const perfect = days.filter(k => dayStatus(k, game.recs[k], game.ix).perfect).length;
+  const avgs = weeklyAverages(body); const cur = avgs.find(a => a.week === wk), prev = avgs.find(a => a.week === dateKey(addDays(ws, -7)));
+  const dW = cur && prev ? cur.avg - prev.avg : null;
+  const score = Math.min(3, gym) * 2 + Math.min(2, jjb) + (protAvg >= 140 ? 2 : protAvg >= 110 ? 1 : 0) + Math.min(2, perfect);
+  const msg = score >= 9 ? 'Semaine de machine. Volthys est fier de toi ⚡ Continue exactement comme ça.'
+    : score >= 6 ? 'Belle semaine ! Un petit détail à soigner et ce sera parfait.'
+    : score >= 3 ? 'Semaine moyenne : pas grave, la régularité se construit. Vise 3 séances la semaine prochaine.'
+    : 'Semaine difficile, ça arrive. Recommence lundi avec juste la séance A : le reste suivra.';
+  const tip = gym < 3 ? 'Priorité : les 3 séances de salle.' : protAvg != null && protAvg < 140 ? 'Priorité : monter les protéines (skyr, œufs, whey).' : jjb < 2 ? 'Priorité : tes 2 jiu-jitsu.' : 'Garde le rythme et dors 7 h 30.';
+  return `<div class="card report" id="report-card"><div class="row between"><h2 style="margin:0">📊 Bilan de la semaine</h2><button class="btn sm ghost" id="rp-x">OK</button></div>
+    <div class="small muted">Du ${fmtShort(days[0])} au ${fmtShort(days[6])}</div>
+    <div class="rp-grid">
+      <div><b>${gym}/3</b><span>salle</span></div><div><b>${jjb}/2</b><span>jiu-jitsu</span></div>
+      <div><b>${protAvg != null ? protAvg + ' g' : '—'}</b><span>protéines/jour</span></div><div><b>${perfect}</b><span>jours parfaits</span></div>
+      <div><b>+${xp}</b><span>XP</span></div><div><b>${dW != null ? (dW > 0 ? '+' : '') + frn(dW) + ' kg' : cur ? frn(cur.avg) + ' kg' : '—'}</b><span>${dW != null ? 'poids moyen' : 'poids'}</span></div>
+    </div>
+    <div class="small" style="margin-top:10px"><b>${esc(msg)}</b><br>${esc(tip)}</div></div>`;
+}
+async function backupCard(meals, workouts, body) {
+  if (meals.length + workouts.length + body.length < 5) return '';
+  const last = await getSetting('lastBackup', 0), snooze = await getSetting('backupSnooze', 0);
+  const days = last ? Math.floor((Date.now() - last) / 864e5) : null;
+  if ((last && days < 7) || Date.now() < snooze) return '';
+  return `<div class="card yellow" id="bk-card"><div class="row between"><div><b>💾 ${days == null ? 'Pense à sauvegarder ta progression' : `Dernière sauvegarde il y a ${days} jours`}</b>
+    <div class="small muted">Tes données sont seulement sur ce téléphone : une copie te protège si tu le perds ou en changes.</div></div></div>
+    <div class="row" style="gap:8px;margin-top:10px"><button class="btn primary sm" id="bk-now" style="flex:1">Sauvegarder</button><button class="btn sm ghost" id="bk-later">Plus tard</button></div></div>`;
+}
+
 VIEWS.home = async () => {
   const [meals, workouts, body, goals, program, active, game] = await Promise.all([
     dbAll('meals'), dbAll('workouts'), dbAll('body'), getGoals(), getSetting('program'), getSetting('activeSession'), computeGame()]);
@@ -1180,6 +1231,7 @@ VIEWS.home = async () => {
   let monMood = sessionStorage.getItem('monHappy') ? 'happy' : (!(game.daysXp[today] > 0) && !(game.daysXp[yest] > 0) && today > (await getSetting('firstDay', today)) ? 'sleepy' : '');
   sessionStorage.removeItem('monHappy');
 
+  const extraCards = (await weeklyReportCard(game, workouts, body)) + (await backupCard(meals, workouts, body));
   view().innerHTML = `
     <div class="hello"><div class="h">${hi}${goals.name ? ', ' + esc(goals.name) : ''} 👋</div><div class="s">${beforeStart ? `Ton programme démarre lundi 16 novembre · J-${daysBetween(today, PROG_START)}` : isFestive(today) ? 'Les fêtes : profite, garde juste les protéines et la salle 🎄' : 'Prêt à tout donner aujourd\'hui ?'}</div></div>
 
@@ -1202,6 +1254,7 @@ VIEWS.home = async () => {
       ${isDeload(today) ? `<div class="small" style="margin-top:8px;font-weight:700">⚡ Semaine allégée : mêmes charges, une série de moins.</div>` : ''}
     </div>
 
+    ${extraCards}
     ${active ? `<div class="card mint"><div class="row between"><div><div class="small muted" style="font-weight:600">Séance en cours</div><div style="font-size:19px;font-weight:800;margin-top:2px">${esc(active.name)}</div><div class="small muted">depuis ${esc(active.start)}</div></div>
         <button class="btn primary" id="resume">Reprendre</button></div></div>` : ''}
 
@@ -1242,6 +1295,9 @@ VIEWS.home = async () => {
   `;
   const rs = $('#resume'); if (rs) rs.onclick = () => go('train');
   $('#level-card').onclick = () => trophiesSheet(game);
+  const rpx = $('#rp-x'); if (rpx) rpx.onclick = async () => { const now = new Date(); await setSetting('reportSeen', dateKey(now.getDay() === 1 ? addDays(weekStart(), -7) : weekStart())); $('#report-card').remove(); };
+  const bkn = $('#bk-now'); if (bkn) bkn.onclick = async () => { await exportBackup(); go('home'); };
+  const bkl = $('#bk-later'); if (bkl) bkl.onclick = async () => { await setSetting('backupSnooze', Date.now() + 3 * 864e5); $('#bk-card').remove(); };
   $('#qa-train').onclick = async () => { if (!active && nextDay) await startSession(nextDay); go('train'); };
   $('#qa-food').onclick = () => quickMealPhoto();
   $('#qa-body').onclick = () => go('body');
@@ -1909,7 +1965,7 @@ async function renderSession(s) {
       <ol class="small" style="margin:8px 0 0;padding-left:18px;line-height:1.6">${WARMUP.map(w => `<li>${esc(w)}</li>`).join('')}</ol></details>` : ''}
     ${s.technique ? `<div class="card yellow small"><b>Semaines 1–2 : la technique avant la charge.</b> Charges légères, 3 répétitions en réserve.</div>` : ''}
     ${s.deload ? `<div class="card green small"><b>Semaine allégée.</b> Mêmes charges, une série de moins par exercice.</div>` : ''}
-    <div id="ex-list">${s.exercises.map((e, ei) => exHTML(e, ei, workouts)).join('')}</div>
+    <div id="ex-list">${s.exercises.map((e, ei) => exHTML(e, ei, workouts, s)).join('')}</div>
     <div class="small muted" style="margin:8px 4px">Forme du jour : moins de 6 h de sommeil, JJB très dur ou une douleur ? Enlève une série par exercice, sans baisser la charge. Douleur articulaire vive : arrête l'exercice.</div>
     <button class="btn block" id="s-addex" style="margin-top:6px">+ Ajouter un exercice</button>
     <label>Notes de séance</label><textarea id="s-notes" placeholder="Sensations, douleurs, énergie...">${esc(s.notes || '')}</textarea>
@@ -1939,6 +1995,8 @@ async function renderSession(s) {
         } else startRest(restPrefs.set, `Repos · prochaine série : ${ex.sets.filter(x => x.done).length + 1}/${ex.sets.length}`);
       }
       persistSession(s);
+    } else if (b.dataset.act === 'sugg') {
+      s.exercises[ei].sets.forEach(x => { if (!x.done) x.weight = b.dataset.w; }); persistSession(s); renderSession(s); toast('Charge appliquée 💪');
     } else if (b.dataset.act === 'demo') {
       demoSheet(s.exercises[ei].name, s.exercises[ei].tip);
     } else if (b.dataset.act === 'addset') {
@@ -1985,8 +2043,28 @@ async function renderSession(s) {
   };
 }
 
-function exHTML(e, ei, workouts) {
+const HEAVY_RX = /squat|soulev|roumain|presse|rowing|tirage|couche barre|bench|deadlift|leg press/;
+const ISO_RX = /elevation|curl|triceps|face pull|pallof|extension|lateral/;
+const frn = v => String(r1(v)).replace('.', ',');
+function suggestLoad(e, workouts, deload) {
+  const lp = lastPerf(workouts, e.name); if (!lp || !lp.sets.length) return null;
+  const ws = lp.sets.map(x => num(x.weight) || 0); const maxW = Math.max(...ws); if (!(maxW > 0)) return null;
+  const m = String(e.target || '').match(/(\d+)\s*[–-]\s*(\d+)/) || String(e.target || '').match(/×\s*(\d+)\s*$/);
+  if (!m) return null;
+  const top = +(m[2] || m[1]);
+  const n = norm(e.name);
+  if (deload) return { w: maxW, txt: `Semaine allégée : garde ${frn(maxW)} kg, une série de moins.` };
+  const allTop = lp.sets.every(x => (num(x.reps) || 0) >= top && (num(x.weight) || 0) >= maxW);
+  if (allTop) {
+    const inc = HEAVY_RX.test(n) ? 2.5 : ISO_RX.test(n) ? 1 : 2;
+    return { w: Math.round((maxW + inc) * 2) / 2, up: true, txt: `Tu as fait ${top} reps partout : passe à ${frn(maxW + inc)} kg et vise le bas de la fourchette.` };
+  }
+  return { w: maxW, txt: `Garde ${frn(maxW)} kg et vise +1 répétition par série (jusqu'à ${top}).` };
+}
+
+function exHTML(e, ei, workouts, sess) {
   const lp = lastPerf(workouts, e.name);
+  const sg = suggestLoad(e, workouts, sess && sess.deload);
   return `<div class="ex">
     <div class="ex-top"><button class="demo-th" data-ei="${ei}" data-act="demo" aria-label="Voir la démo">${demoAnim(demoFor(e.name))}<span class="play">▶</span></button>
       <div style="flex:1;min-width:0"><div class="ex-head"><b>${esc(e.name)}</b></div>
@@ -1994,6 +2072,7 @@ function exHTML(e, ei, workouts) {
       <div class="small muted">⏱️ ${fmtRest(restPrefs.set)} entre séries · ${fmtRest(restPrefs.ex)} avant l'exo suivant</div>
       <button class="link-btn small" data-ei="${ei}" data-act="demo">Voir comment faire ›</button></div></div>
     ${e.tip ? `<div class="small muted" style="margin-top:6px">💡 ${esc(e.tip)}</div>` : ''}
+    ${sg ? `<div class="sugg ${sg.up ? 'up' : ''}"><span>${sg.up ? '📈' : '🎯'} ${esc(sg.txt)}</span>${e.sets.some(x => !x.done && String(x.weight) !== String(sg.w)) ? `<button class="btn sm" data-ei="${ei}" data-act="sugg" data-w="${sg.w}">Appliquer</button>` : ''}</div>` : ''}
     ${lp ? `<div class="prev">Dernière fois (${fmtShort(lp.date)}) : ${lp.sets.map(s => `${s.weight || 0}×${s.reps || 0}`).join(', ') || '—'}</div>` : ''}
     <div class="set small muted" style="margin-top:8px"><span class="n">#</span><span style="text-align:center">kg</span><span style="text-align:center">reps</span><span></span></div>
     ${e.sets.map((st, si) => `<div class="set"><span class="n">${si + 1}</span>
@@ -2037,7 +2116,8 @@ function renderTimer() {
   const slot = $('#timer-slot'); if (!slot || !restTimer) { if (!slot && restTimer) { clearInterval(restTimer.iv); restTimer = null; } return; }
   const left = Math.ceil((restTimer.end - Date.now()) / 1000);
   if (left <= 0) {
-    stopRest(); beep(1046, 0.45, 0.35); navigator.vibrate && navigator.vibrate([300, 120, 300]);
+    const lbl = restTimer.label; stopRest(); beep(1046, 0.45, 0.35); navigator.vibrate && navigator.vibrate([300, 120, 300]);
+    if (document.hidden) notify('⏱️ Repos terminé', lbl.startsWith('Prochain') ? lbl : 'Série suivante, c\'est reparti !', 'rest');
     toast('⏱️ C\'est reparti !'); return;
   }
   if (left <= 3 && restTimer.last !== left) { beep(880, 0.1); navigator.vibrate && navigator.vibrate(80); }
@@ -2106,13 +2186,34 @@ VIEWS.body = async () => {
     <div class="card"><h2>Poids</h2>${lineChart(wPts, { target: goals.targetWeight ?? null, unit: ' kg' })}</div>
     ${fatPts.length >= 2 ? `<div class="card"><h2>Masse grasse (Basic-Fit)</h2>${lineChart(fatPts, { target: goals.targetBF ?? null, unit: ' %' })}</div>` : ''}
     ${waistPts.length >= 2 ? `<div class="card"><h2>Tour de taille</h2>${lineChart(waistPts, { unit: ' cm' })}</div>` : ''}
-    ${photos.length ? `<div class="card"><h2>Photos de progression</h2><div class="grid3">${photos.map(b => `<div><img src="${blobURL(b.photo)}" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px" alt=""><div class="small muted" style="text-align:center">${fmtShort(b.date)}</div></div>`).join('')}</div></div>` : ''}
+    ${photos.length ? `<div class="card"><div class="row between"><h2 style="margin:0">Photos de progression</h2>${photos.length >= 2 ? '<button class="btn sm primary" id="cmp-btn">Avant / après</button>' : ''}</div><div style="height:10px"></div><div class="grid3">${photos.map(b => `<div><img src="${blobURL(b.photo)}" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px" alt=""><div class="small muted" style="text-align:center">${fmtShort(b.date)}</div></div>`).join('')}</div></div>` : ''}
     <div class="card"><h2>Historique</h2><table><tr><th>Date</th><th>Source</th><th>Poids</th><th>MG %</th></tr>
       ${body.map(b => `<tr class="brow" data-id="${b.id}"><td>${fmtShort(b.date)}</td><td class="small">${esc(src(b))}</td><td>${b.weight != null ? r1(b.weight) : "—"}</td><td>${b.bodyfat != null ? r1(b.bodyfat) : "—"}</td></tr>`).join('')}</table></div>`
     : `<div class="empty"><div class="big">📏</div>Aucune mesure pour l'instant.<br>Appuie sur <b>+</b> après ta pesée Basic-Fit.</div>`);
   view().querySelectorAll('.brow').forEach(r => r.onclick = () => bodySheet(body.find(b => b.id === r.dataset.id)));
+  const cb = $('#cmp-btn'); if (cb) cb.onclick = () => compareSheet(body.filter(b => b.photo).sort((a, b) => a.date.localeCompare(b.date) || a.ts - b.ts));
   addFab(() => bodySheet(null));
 };
+
+function compareSheet(list) {
+  const opt = sel => list.map((b, i) => `<option value="${i}" ${i === sel ? 'selected' : ''}>${fmtShort(b.date)}${b.weight != null ? ' · ' + frn(b.weight) + ' kg' : ''}${b.bodyfat != null ? ' · ' + frn(b.bodyfat) + ' %' : ''}</option>`).join('');
+  openSheet(`<h2>Avant / après</h2>
+    <div class="grid2"><div><label>Avant</label><select id="cp-a">${opt(0)}</select></div><div><label>Après</label><select id="cp-b">${opt(list.length - 1)}</select></div></div>
+    <div class="cmp" id="cp-box"><img id="cp-ib" alt=""><img id="cp-ia" alt=""><div class="cmp-line" id="cp-line"></div>
+      <span class="cmp-tag l">Avant</span><span class="cmp-tag r">Après</span></div>
+    <input type="range" id="cp-r" min="0" max="100" value="50" style="width:100%;margin-top:10px">
+    <div class="small muted" id="cp-d" style="text-align:center"></div>
+    <div class="sheet-actions"><button class="btn ghost" id="cp-c" style="flex:1">Fermer</button></div>`);
+  const upd = () => {
+    const a = list[+$('#cp-a').value], b = list[+$('#cp-b').value];
+    $('#cp-ia').src = blobURL(a.photo); $('#cp-ib').src = blobURL(b.photo);
+    const dd = daysBetween(a.date, b.date), dw = a.weight != null && b.weight != null ? b.weight - a.weight : null, df = a.bodyfat != null && b.bodyfat != null ? b.bodyfat - a.bodyfat : null;
+    $('#cp-d').textContent = `${dd} jours d'écart${dw != null ? ` · ${dw > 0 ? '+' : dw < 0 ? '−' : ''}${frn(Math.abs(dw))} kg` : ''}${df != null ? ` · ${df > 0 ? '+' : df < 0 ? '−' : ''}${frn(Math.abs(df))} % MG` : ''}`;
+  };
+  const slide = () => { const v = $('#cp-r').value; $('#cp-ia').style.clipPath = `inset(0 ${100 - v}% 0 0)`; $('#cp-line').style.left = v + '%'; };
+  $('#cp-a').onchange = upd; $('#cp-b').onchange = upd; $('#cp-r').oninput = slide; $('#cp-c').onclick = closeSheet;
+  upd(); slide();
+}
 
 function bodySheet(entry) {
   const isNew = !entry;
@@ -2176,6 +2277,7 @@ VIEWS.settings = async () => {
   try { est = navigator.storage && await navigator.storage.estimate(); } catch { }
   try { persisted = navigator.storage && navigator.storage.persisted && await navigator.storage.persisted(); } catch { }
   const restP = { ...REST_DEF, ...(await getSetting('restPrefs', {})) };
+  const rem = await getRem();
   const mb = v => v > 1e9 ? r1(v / 1e9) + ' Go' : Math.round(v / 1e6) + ' Mo';
 
   view().innerHTML = `
@@ -2192,6 +2294,19 @@ VIEWS.settings = async () => {
         <div><label>Masse grasse objectif (%)</label><input id="g-tbf" inputmode="decimal" value="${goals.targetBF ?? ''}"></div>
       </div>
       <button class="btn primary block" id="g-save" style="margin-top:14px">Enregistrer les objectifs</button>
+    </div>
+
+    <div class="card"><h2>Rappels</h2>
+      <div class="small muted">Le plus fiable : ajoute tes rappels à l'agenda du téléphone (ils sonnent même appli fermée). Les notifications de l'appli servent en plus (fin du repos, rappel du jour quand Android le permet).</div>
+      <div class="grid2">
+        <div><label>Heure salle</label><input id="rm-gym" type="time" value="${rem.gym}"></div>
+        <div><label>Créatine</label><input id="rm-crea" type="time" value="${rem.crea}"></div>
+        <div><label>JJB mercredi</label><input id="rm-jw" type="time" value="${rem.jjbWed}"></div>
+        <div><label>JJB dimanche</label><input id="rm-js" type="time" value="${rem.jjbSun}"></div>
+        <div><label>Coucher</label><input id="rm-bed" type="time" value="${rem.bed}"></div>
+      </div>
+      <button class="btn primary block" id="rm-ics" style="margin-top:12px">📅 Ajouter les rappels à mon agenda</button>
+      <button class="btn block" id="rm-notif" style="margin-top:8px">🔔 ${typeof Notification !== 'undefined' && Notification.permission === 'granted' ? 'Notifications activées ✓' : 'Activer les notifications'}</button>
     </div>
 
     <div class="card"><h2>Minuteur de repos</h2>
@@ -2247,6 +2362,9 @@ VIEWS.settings = async () => {
     await setSetting('nutritionContext', $('#k-ctx').value.trim());
   };
   $('#k-eye').onclick = () => { const i = $('#k-key'); i.type = i.type === 'password' ? 'text' : 'password'; };
+  const saveRem = () => setSetting('reminders', { gym: $('#rm-gym').value || REM_DEF.gym, crea: $('#rm-crea').value || REM_DEF.crea, jjbWed: $('#rm-jw').value || REM_DEF.jjbWed, jjbSun: $('#rm-js').value || REM_DEF.jjbSun, bed: $('#rm-bed').value || REM_DEF.bed });
+  $('#rm-ics').onclick = async () => { await saveRem(); await exportICS(); };
+  $('#rm-notif').onclick = async () => { if (await enableNotifs()) $('#rm-notif').textContent = '🔔 Notifications activées ✓'; };
   $('#r-save').onclick = async () => {
     const v = (id, d) => Math.min(600, Math.max(10, parseInt($(id).value) || d));
     await setSetting('restPrefs', { set: v('#r-set', 30), ex: v('#r-ex', 90) }); toast('Minuteur enregistré ✓');
@@ -2286,6 +2404,49 @@ VIEWS.settings = async () => {
   const ps = $('#persist'); if (ps) ps.onclick = async () => { const ok = await navigator.storage.persist(); toast(ok ? 'Stockage protégé ✓' : "Chrome a refusé pour l'instant : installe l'appli sur l'écran d'accueil puis réessaie."); go('settings'); };
 };
 
+/* ---------------- Rappels : notifications + agenda du téléphone (.ics) ---------------- */
+const REM_DEF = { gym: '18:00', jjbWed: '19:00', jjbSun: '11:00', crea: '08:00', bed: '22:30' };
+async function getRem() { return { ...REM_DEF, ...(await getSetting('reminders', {})) }; }
+async function enableNotifs() {
+  if (!('Notification' in window)) { toast('Notifications indisponibles sur ce navigateur.'); return false; }
+  const p = await Notification.requestPermission();
+  if (p !== 'granted') { toast('Notifications refusées : active-les dans les réglages du navigateur.', 3500); return false; }
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    if ('periodicSync' in reg) {
+      const st = await navigator.permissions.query({ name: 'periodic-background-sync' }).catch(() => null);
+      if (!st || st.state === 'granted') await reg.periodicSync.register('sb-daily', { minInterval: 12 * 3600e3 });
+    }
+    reg.showNotification('Summer Body', { body: 'Notifications activées ✓ Volthys te tiendra au courant ⚡', icon: 'icon-192.png', tag: 'test' });
+  } catch { }
+  return true;
+}
+async function notify(title, body, tag) {
+  try { if (Notification.permission !== 'granted') return; const reg = await navigator.serviceWorker.ready; reg.showNotification(title, { body, tag, renotify: true, icon: 'icon-192.png', vibrate: [300, 120, 300] }); } catch { }
+}
+function icsDate(k, hm) { return k.replace(/-/g, '') + 'T' + hm.replace(':', '') + '00'; }
+function addMin(hm, m) { const [h, mi] = hm.split(':').map(Number); const t = h * 60 + mi + m; return pad(Math.floor(t / 60) % 24) + ':' + pad(t % 60); }
+async function exportICS() {
+  const r = await getRem(), until = PROG_END.replace(/-/g, '') + 'T235959Z', stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z';
+  const firstOn = wd => { let d = parseKey(PROG_START); while (d.getDay() !== wd) d = addDays(d, 1); return dateKey(d); };
+  const BY = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+  const ev = [];
+  const E = (uid, title, start, end, rule, alarm, desc = '') => ev.push(['BEGIN:VEVENT', `UID:${uid}@summerbody`, `DTSTAMP:${stamp}`, `DTSTART:${start}`, `DTEND:${end}`, rule ? `RRULE:${rule}` : '', `SUMMARY:${title}`, desc ? `DESCRIPTION:${desc}` : '',
+    'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${title}`, `TRIGGER:-PT${alarm}M`, 'END:VALARM', 'END:VEVENT'].filter(Boolean).join('\r\n'));
+  PROGRAMME_SB.jours.forEach(j => { const k = firstOn(j.jourSemaine); E('gym-' + j.jourSemaine, `🏋️ ${j.nom} (salle)`, icsDate(k, r.gym), icsDate(k, addMin(r.gym, 70)), `FREQ=WEEKLY;BYDAY=${BY[j.jourSemaine]};UNTIL=${until}`, 30, 'Ouvre Summer Body et lance la séance.'); });
+  let k = firstOn(3); E('jjb-wed', '🥋 Jiu-jitsu', icsDate(k, r.jjbWed), icsDate(k, addMin(r.jjbWed, 60)), `FREQ=WEEKLY;BYDAY=WE;UNTIL=${until}`, 60);
+  k = firstOn(0); E('jjb-sun', '🥋 Jiu-jitsu', icsDate(k, r.jjbSun), icsDate(k, addMin(r.jjbSun, 120)), `FREQ=WEEKLY;BYDAY=SU;UNTIL=${until}`, 60);
+  E('crea', '💊 Créatine 3–5 g + grand verre d\'eau', icsDate(PROG_START, r.crea), icsDate(PROG_START, addMin(r.crea, 5)), `FREQ=DAILY;UNTIL=${until}`, 0);
+  E('bed', '😴 Magnésium + au lit (7 h 30 de sommeil)', icsDate(PROG_START, r.bed), icsDate(PROG_START, addMin(r.bed, 5)), `FREQ=DAILY;UNTIL=${until}`, 0);
+  E('sunday', '📊 Bilan du dimanche dans Summer Body', icsDate(firstOn(0), '20:00'), icsDate(firstOn(0), '20:10'), `FREQ=WEEKLY;BYDAY=SU;UNTIL=${until}`, 0);
+  CHECKINS.forEach(c => E('checkin-' + c, '📸 Check-in : balance Basic-Fit, tour de taille, photos', icsDate(c, '08:00'), icsDate(c, '08:15'), '', 0));
+  const txt = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Summer Body//FR', 'CALSCALE:GREGORIAN', 'X-WR-CALNAME:Summer Body', ...ev, 'END:VCALENDAR'].join('\r\n');
+  const name = 'summerbody-rappels.ics', blob = new Blob([txt], { type: 'text/calendar' }), file = new File([blob], name, { type: 'text/calendar' });
+  try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  toast('Fichier rappels téléchargé ✓ Ouvre-le pour l\'ajouter à ton agenda.', 4000);
+}
+
 /* ---------------- Sauvegarde / restauration ---------------- */
 const blobToDataURL = b => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(b); });
 const dataURLToBlob = async u => (await fetch(u)).blob();
@@ -2308,10 +2469,11 @@ async function exportBackup() {
   const name = `summerbody-sauvegarde-${dateKey()}.json`;
   const file = new File([blob], name, { type: 'application/json' });
   try {
-    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); toast('Sauvegarde exportée ✓'); return; }
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); await setSetting('lastBackup', Date.now()); toast('Sauvegarde exportée ✓'); return; }
   } catch (e) { if (e && e.name === 'AbortError') { toast('Export annulé'); return; } }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+  await setSetting('lastBackup', Date.now());
   toast('Sauvegarde téléchargée ✓ (' + Math.round(blob.size / 1e6) + ' Mo)');
 }
 
@@ -2319,6 +2481,14 @@ async function importBackup(file) {
   let data;
   try { data = JSON.parse(await file.text()); } catch { toast('Fichier illisible.'); return; }
   if (!data || data.app !== 'summerbody') { toast("Ce fichier n'est pas une sauvegarde Summer Body."); return; }
+  if (data.kind === 'starter') {
+    if (!(await confirmSheet(`Ajouter tes données de départ (${(data.body || []).length} mesures, objectifs, contexte du coach) ? Rien ne sera effacé.`, 'Ajouter', false))) return;
+    const have = new Set((await dbAll('body')).map(b => b.id));
+    for (const b of data.body || []) if (!have.has(b.id)) await dbPut('body', b);
+    if (data.goals) await setSetting('goals', { ...(await getSetting('goals', {})), ...data.goals });
+    if (data.nutritionContext) await setSetting('nutritionContext', data.nutritionContext);
+    toast('Données de départ ajoutées ✓'); go('home'); return;
+  }
   const n = (data.meals || []).length + (data.workouts || []).length + (data.body || []).length;
   if (!(await confirmSheet(`Remplacer toutes les données actuelles par cette sauvegarde (${n} éléments) ?`, 'Restaurer'))) return;
   toast('Restauration...', 8000);
