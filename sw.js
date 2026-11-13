@@ -1,6 +1,6 @@
 // Service worker : met l'appli en cache pour qu'elle marche sans reseau.
-const CACHE = 'summerbody-v4';
-const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+const CACHE = 'summerbody-v5';
+const FILES = ['./', './index.html', './app.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
