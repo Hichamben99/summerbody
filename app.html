@@ -297,6 +297,28 @@ html,body{overflow-x:hidden}
 .evolve-flash{animation:evoFlash 2.2s ease-out}
 @keyframes evoFlash{0%{filter:brightness(0) invert(1);transform:scale(.6)}35%{filter:brightness(0) invert(1);transform:scale(1.15)}60%{filter:brightness(2.2)}100%{filter:none;transform:scale(1)}}
 
+/* Agenda */
+.cal-h{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));text-align:center;font-size:11px;font-weight:800;color:var(--muted);margin:14px 0 6px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.cal-d{position:relative;aspect-ratio:1/1.1;border-radius:12px;background:var(--card2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;font-size:12px}
+.cal-d.empty{background:none;cursor:default}
+.cal-d .cn{font-weight:700;color:var(--muted);font-size:11px}
+.cal-d .ci{font-size:12px;font-weight:900;line-height:1;min-height:12px}
+.cal-d .cc{position:absolute;top:-4px;right:-3px;font-size:11px}
+.cal-d .cx{position:absolute;bottom:2px;right:4px;font-size:10px;font-weight:900;color:var(--peach-d)}
+.cal-d.gym{background:var(--teal-soft)}.cal-d.gym .ci{color:var(--teal-d)}
+.cal-d.jjb{background:var(--lilac-soft)}
+.cal-d.rest{background:#f1f3f2}
+.cal-d.off{opacity:.35}
+.cal-d.deload{box-shadow:inset 0 -3px 0 #9fd58a}
+.cal-d.done.gym{background:var(--teal);}.cal-d.done.gym .cn,.cal-d.done.gym .ci{color:#fff}
+.cal-d.done.jjb{background:#7b5ce0}.cal-d.done.jjb .cn,.cal-d.done.jjb .ci{color:#fff}
+.cal-d.missed{box-shadow:inset 0 0 0 2px rgba(229,83,75,.45)}
+.cal-d.today{outline:2.5px solid var(--text);outline-offset:1px}
+.cal-legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:12px}
+.cal-legend .lg{display:inline-block;width:10px;height:10px;border-radius:4px;margin-right:4px;vertical-align:-1px}
+.lg.gym{background:var(--teal-soft);box-shadow:inset 0 0 0 1px var(--teal)}.lg.jjb{background:var(--lilac-soft);box-shadow:inset 0 0 0 1px #7b5ce0}.lg.rest{background:#f1f3f2;box-shadow:inset 0 0 0 1px #ccc}.lg.done{background:var(--teal)}
+
 </style>
 </head>
 <body>
@@ -326,7 +348,7 @@ html,body{overflow-x:hidden}
 'use strict';
 /* Summer Body — appli de suivi 100 % locale (IndexedDB). Aucune donnée ne quitte le téléphone. */
 
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.1.0';
 
 /* ---------------- Base de données locale ---------------- */
 const DB_NAME = 'summerbody';
@@ -783,9 +805,9 @@ const slotOfTime = t => { const h = parseInt((t || '12').split(':')[0], 10); ret
 /* Index des données par jour, pour valider les missions automatiquement. */
 function buildIndex(meals, workouts, body) {
   const ix = {};
-  const get = k => (ix[k] = ix[k] || { meals: { matin: 0, midi: 0, soir: 0 }, prot: 0, workouts: 0, weigh: false, checkin: false });
+  const get = k => (ix[k] = ix[k] || { meals: { matin: 0, midi: 0, soir: 0 }, prot: 0, workouts: 0, jjb: 0, weigh: false, checkin: false });
   meals.forEach(m => { const d = get(m.date); d.meals[slotOfTime(m.time)]++; d.prot += m.p || 0; });
-  workouts.forEach(w => { get(w.date).workouts++; });
+  workouts.forEach(w => { if (w.type === 'jjb') get(w.date).jjb++; else get(w.date).workouts++; });
   body.forEach(b => { const d = get(b.date); if (b.weight != null) d.weigh = true; if (b.weight != null && (b.waist != null || b.photo)) d.checkin = true; });
   return ix;
 }
@@ -802,8 +824,8 @@ function tasksFor(k, custom = []) {
   if (!started) add('main', 'main', 'Prépare-toi : relis ton programme dans l\'onglet Séances', 30, { prio: 'haute', hint: 'Le programme démarre le lundi 16 novembre.' });
   else if (finished) add('main', 'main', 'Garde le rythme : une séance ou 45 min de marche', 60, { prio: 'haute' });
   else if (seance) add('main', 'main', `${seance.nom} à la salle`, 100, { prio: 'haute', auto: d => d.workouts > 0, hint: isDeload(k) ? 'Semaine allégée : mêmes charges, une série de moins.' : 'Garde 1 à 2 répétitions en réserve.' });
-  else if (wd === 3) add('main', 'main', 'Jiu-jitsu (1 h)', 80, { prio: 'haute' });
-  else if (wd === 0) add('main', 'main', 'Jiu-jitsu (2 h)', 100, { prio: 'haute', hint: 'Ce soir, la 2e portion de féculents est permise.' });
+  else if (wd === 3) add('main', 'main', 'Jiu-jitsu (1 h)', 80, { prio: 'haute', auto: d => d.jjb > 0, hint: 'Enregistre-le dans Séances → Jiu-jitsu.' });
+  else if (wd === 0) add('main', 'main', 'Jiu-jitsu (2 h)', 100, { prio: 'haute', auto: d => d.jjb > 0, hint: 'Ce soir, la 2e portion de féculents est permise.' });
   else add('main', 'main', 'Jour de repos actif : marche de 30 à 45 min', 40, { prio: 'haute', hint: 'Le repos fait partie du programme : c\'est là que tu progresses.' });
 
   if (CHECKINS.includes(k)) add('checkin', 'matin', 'Check-in : balance Basic-Fit, tour de taille, photos face/profil/dos', 150, { prio: 'haute', auto: d => d.checkin, hint: 'Onglet Corps : la mesure Basic-Fit + tour de taille ou photo valide le check-in.' });
@@ -835,7 +857,7 @@ function tasksFor(k, custom = []) {
 
 function dayStatus(k, rec, ix) {
   const tasks = tasksFor(k, (rec && rec.custom) || []);
-  const d = ix[k] || { meals: { matin: 0, midi: 0, soir: 0 }, prot: 0, workouts: 0, weigh: false, checkin: false };
+  const d = ix[k] || { meals: { matin: 0, midi: 0, soir: 0 }, prot: 0, workouts: 0, jjb: 0, weigh: false, checkin: false };
   const done = (rec && rec.done) || {};
   const list = tasks.map(t => ({ ...t, autoDone: !!(t.auto && t.auto(d)), done: !!done[t.id] || !!(t.auto && t.auto(d)) }));
   const xp = list.filter(t => t.done).reduce((a, t) => a + t.xp, 0);
@@ -876,13 +898,16 @@ async function computeGame() {
   }
   // Séances faites hors des jours prévus : bonus
   const plannedDays = new Set(PROGRAMME_SB.jours.map(j => j.jourSemaine));
-  const extra = workouts.filter(w => !plannedDays.has(parseKey(w.date).getDay())).length;
+  const gymW = workouts.filter(w => w.type !== 'jjb'), jjbW = workouts.filter(w => w.type === 'jjb');
+  const extra = gymW.filter(w => !plannedDays.has(parseKey(w.date).getDay())).length;
+  const jjbExtra = jjbW.filter(w => !JJB_DAYS[parseKey(w.date).getDay()]).length;
+  jjb += jjbExtra; xp += jjbExtra * 40;
   const prs = prEvents(workouts);
   xp += extra * 60 + prs * 25;
 
   // Semaines complètes (3 séances du lundi au dimanche)
   const byWeek = {};
-  workouts.forEach(w => { const k = dateKey(weekStart(parseKey(w.date))); byWeek[k] = (byWeek[k] || 0) + 1; });
+  gymW.forEach(w => { const k = dateKey(weekStart(parseKey(w.date))); byWeek[k] = (byWeek[k] || 0) + 1; });
   const fullWeeks = Object.values(byWeek).filter(n => n >= 3).length;
   xp += fullWeeks * 100;
 
@@ -891,7 +916,7 @@ async function computeGame() {
   const level = levelOf(xp);
   const B = (id, ico, nom, desc, ok) => ({ id, ico, nom, desc, ok: !!ok });
   const badges = [
-    B('first', '🏁', 'Premier pas', 'Ta première séance enregistrée', workouts.length >= 1),
+    B('first', '🏁', 'Premier pas', 'Ta première séance enregistrée', gymW.length >= 1),
     B('week', '📆', 'Semaine complète', '3 séances dans la même semaine', fullWeeks >= 1),
     B('week4', '🗓️', 'Un mois carré', '4 semaines complètes', fullWeeks >= 4),
     B('s7', '🔥', 'En feu', '7 jours d\'affilée actifs', streak >= 7),
@@ -901,8 +926,8 @@ async function computeGame() {
     B('prot7', '🥩', 'Protéiné', '140 g de protéines sur 7 jours', protDays >= 7),
     B('perfect', '💯', 'Journée parfaite', 'Toutes les missions d\'une journée', perfectDays >= 1),
     B('perfect10', '✨', 'Perfectionniste', '10 journées parfaites', perfectDays >= 10),
-    B('jjb10', '🥋', 'Tatami', '10 séances de jiu-jitsu cochées', jjb >= 10),
-    B('w25', '💪', 'Bête de salle', '25 séances de salle', workouts.length >= 25),
+    B('jjb10', '🥋', 'Tatami', '10 séances de jiu-jitsu', jjb >= 10),
+    B('w25', '💪', 'Bête de salle', '25 séances de salle', gymW.length >= 25),
     B('checkin1', '📸', 'Premier bilan', 'Check-in du 13 décembre', checkins >= 1),
     B('checkin4', '🎯', 'Ligne d\'arrivée', 'Les 4 check-ins jusqu\'au 10 mars', checkins >= 4),
     B('lvl10', '⭐', 'Niveau 10', 'Atteindre le niveau 10', level >= 10),
@@ -1017,7 +1042,7 @@ VIEWS.home = async () => {
 
   const ws = weekStart();
   const wsKey = dateKey(ws);
-  const weekW = workouts.filter(w => w.date >= wsKey).length;
+  const weekW = workouts.filter(w => w.date >= wsKey && w.type !== 'jjb').length;
   const weekTarget = goals.sessionsPerWeek || (program && program.seancesParSemaine) || 3;
   const kcalOf = k => meals.filter(m => m.date === k).reduce((a, m) => a + (m.kcal || 0), 0);
   const kcalTarget = goals.kcalTarget || null;
@@ -1144,6 +1169,7 @@ VIEWS.home = async () => {
       if (!active) await startSession(program && program.jours ? (program.jours.find(j => j.nom === seance.nom) || seance) : seance);
       go('train'); return;
     }
+    if (t.id === 'main' && /Jiu-jitsu/.test(t.label) && !t.done) { jjbSheet(today); return; }
     await toggleTask(today, t); go('home');
   });
   checkLevelUp(game);
@@ -1161,7 +1187,7 @@ async function suggestNextDay(program, workouts) {
     for (let i = 0; i < 7; i++) {
       const d = addDays(new Date(), i), wd = d.getDay();
       const j = program.jours.find(x => x.jourSemaine === wd);
-      if (j && !(i === 0 && workouts.some(w => w.date === dateKey()))) return j;
+      if (j && !(i === 0 && workouts.some(w => w.date === dateKey() && w.type !== 'jjb'))) return j;
     }
   }
   const last = [...workouts].filter(w => w.programDay != null).sort((a, b) => b.ts - a.ts)[0];
@@ -1575,34 +1601,99 @@ function prefillSet(workouts, name, i) {
   return { weight: s ? s.weight : '', reps: s ? s.reps : '', done: false };
 }
 
+let trainMode = 'seances';
+let agendaMonth = null; // 'YYYY-MM'
+const isGym = w => w.type !== 'jjb';
+const JJB_DAYS = { 3: 60, 0: 120 }; // mercredi 1 h, dimanche 2 h
+const DAY_NAMES = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+
+/* Ce qui est prévu un jour donné, d'après le programme. */
+function planFor(k) {
+  const wd = parseKey(k).getDay();
+  const inProg = k >= PROG_START && k <= PROG_END;
+  const seance = PROGRAMME_SB.jours.find(j => j.jourSemaine === wd);
+  const p = { k, wd, kind: 'rest', label: 'Repos actif (marche)', ico: '🚶', inProg };
+  if (!inProg) { p.kind = 'off'; p.label = k < PROG_START ? 'Avant le programme' : 'Après le programme'; p.ico = '·'; }
+  else if (seance) Object.assign(p, { kind: 'gym', label: `${seance.nom} · salle`, ico: '🏋️', seance });
+  else if (JJB_DAYS[wd]) Object.assign(p, { kind: 'jjb', label: `Jiu-jitsu (${JJB_DAYS[wd] / 60} h)`, ico: '🥋', minutes: JJB_DAYS[wd] });
+  p.checkin = CHECKINS.includes(k);
+  p.deload = isDeload(k);
+  p.festive = isFestive(k);
+  return p;
+}
+
+function jjbSheet(dateK, existing) {
+  const k = existing ? existing.date : (dateK || dateKey());
+  const w = existing || { id: uid(), type: 'jjb', date: k, ts: Date.now(), name: 'Jiu-jitsu', duration: JJB_DAYS[parseKey(k).getDay()] || 60, intensity: 3, style: 'Mixte', notes: '', exercises: [] };
+  openSheet(`<h2>🥋 ${existing ? 'Séance de jiu-jitsu' : 'Enregistrer le jiu-jitsu'}</h2>
+    <label>Date</label><input type="date" id="j-date" value="${w.date}">
+    <div class="grid2"><div><label>Durée (min)</label><input id="j-dur" inputmode="numeric" value="${w.duration || ''}"></div>
+      <div><label>Intensité</label><div class="seg" id="j-int" style="margin:0">${[1, 2, 3, 4, 5].map(n => `<button data-v="${n}" class="${n === w.intensity ? 'on' : ''}">${n}</button>`).join('')}</div></div></div>
+    <label>Contenu</label><div class="seg" id="j-sty">${['Technique', 'Mixte', 'Sparring'].map(s => `<button data-v="${s}" class="${s === w.style ? 'on' : ''}">${s}</button>`).join('')}</div>
+    <label>Notes (techniques vues, sensations, douleurs…)</label><textarea id="j-notes" placeholder="ex. passage de garde, bonne énergie">${esc(w.notes || '')}</textarea>
+    <div class="sheet-actions">${existing ? `<button class="btn danger" id="j-del">Supprimer</button>` : `<button class="btn ghost" id="j-c">Annuler</button>`}<button class="btn primary" id="j-ok">Enregistrer</button></div>`);
+  let intensity = w.intensity, style = w.style;
+  const seg = (id, set) => document.querySelectorAll(`#${id} button`).forEach(b => b.onclick = () => { set(b.dataset.v); document.querySelectorAll(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); });
+  seg('j-int', v => intensity = +v); seg('j-sty', v => style = v);
+  if (existing) $('#j-del').onclick = async () => { if (await confirmSheet('Supprimer cette séance de jiu-jitsu ?', 'Supprimer')) { await dbDel('workouts', w.id); go('train'); } };
+  else $('#j-c').onclick = closeSheet;
+  $('#j-ok').onclick = async () => {
+    const before = await computeGame();
+    Object.assign(w, { date: $('#j-date').value || dateKey(), duration: num($('#j-dur').value) || 60, intensity, style, notes: $('#j-notes').value.trim() });
+    w.name = `Jiu-jitsu · ${style}`;
+    await dbPut('workouts', w); closeSheet();
+    const after = await computeGame(); const diff = after.xp - before.xp;
+    toast(diff > 0 ? `🥋 Jiu-jitsu enregistré · +${diff} XP` : '🥋 Jiu-jitsu enregistré ✓', 3000);
+    if (diff > 0) sessionStorage.setItem('monHappy', '1');
+    await checkLevelUp(after);
+    go(currentTab);
+  };
+}
+
+function segTrain() {
+  return `<div class="seg"><button data-tm="seances" class="${trainMode === 'seances' ? 'on' : ''}">🏋️ Séances</button><button data-tm="agenda" class="${trainMode === 'agenda' ? 'on' : ''}">📅 Agenda</button></div>`;
+}
+function bindSegTrain() { view().querySelectorAll('[data-tm]').forEach(b => b.onclick = () => { trainMode = b.dataset.tm; go('train'); }); }
+
 VIEWS.train = async () => {
   const active = await getSetting('activeSession');
   if (active) return renderSession(active);
+  if (trainMode === 'agenda') return renderAgenda();
   const [program, workouts] = await Promise.all([getSetting('program'), dbAll('workouts')]);
   workouts.sort((a, b) => b.ts - a.ts);
-  const recs = Object.values(computeRecords(workouts)).sort((a, b) => a.name.localeCompare(b.name));
+  const gym = workouts.filter(isGym), jjbs = workouts.filter(w => !isGym(w));
+  const recs = Object.values(computeRecords(gym)).sort((a, b) => a.name.localeCompare(b.name));
   const next = await suggestNextDay(program, workouts);
+  const today = dateKey(), todayPlan = planFor(today);
 
   const BG = ['var(--teal-soft)', 'var(--peach-soft)', 'var(--blue-soft)', 'var(--yellow-soft)', 'var(--green-soft)', 'var(--lilac-soft)'];
   const ws = dateKey(weekStart());
-  const weekW = workouts.filter(w => w.date >= ws).length;
-  view().innerHTML = `
-    <div class="hello"><div class="h">Séances</div><div class="s">${weekW} séance${weekW > 1 ? 's' : ''} cette semaine · ${workouts.length} au total${progWeek(dateKey()) ? ` · semaine ${progWeek(dateKey())}/17` : ''}</div></div>
-    ${isDeload(dateKey()) ? `<div class="card green small"><b>Semaine allégée (11–17 janv.)</b> : mêmes charges, une série de moins. Déjà appliqué dans tes séances.</div>` : ''}
-    <div class="card small"><b>Comment progresser :</b> quand tu fais le haut de la fourchette sur toutes les séries, augmente la charge la fois suivante (+2,5 kg jambes et dos, +1 à 2 kg le reste). Garde toujours 1 à 2 répétitions en réserve.</div>
+  const weekW = gym.filter(w => w.date >= ws).length, weekJ = jjbs.filter(w => w.date >= ws).length;
+  const jjbToday = jjbs.some(w => w.date === today);
+  view().innerHTML = segTrain() + `
+    <div class="hello"><div class="h">Séances</div><div class="s">Cette semaine : ${weekW}/3 salle · ${weekJ}/2 jiu-jitsu${progWeek(today) ? ` · semaine ${progWeek(today)}/17` : ''}</div></div>
+    ${isDeload(today) ? `<div class="card green small"><b>Semaine allégée (11–17 janv.)</b> : mêmes charges, une série de moins. Déjà appliqué dans tes séances.</div>` : ''}
     ${program && program.jours && program.jours.length ? `
       <div class="sec-title"><span>${esc(program.nom || 'Mon programme')}</span></div>
-      ${program.description ? `<div class="small muted" style="margin:0 4px">${esc(program.description)}</div>` : ''}
       ${program.jours.map((j, i) => `<div class="wk-card" style="background:${BG[i % BG.length]}">${ART[i % ART.length]}
           ${next && next.nom === j.nom ? '<span class="pill tag">Prochaine</span>' : ''}
-          <div>${j.jourSemaine != null ? `<div class="small" style="font-weight:700;opacity:.65">${['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][j.jourSemaine]}${j.jourSemaine === new Date().getDay() ? ' · AUJOURD\'HUI' : ''}</div>` : ''}<div class="nm">${esc(j.nom)}</div><div class="meta">${j.exercices.length} exercices · ${j.exercices.slice(0, 3).map(e => esc(e.nom)).join(', ')}${j.exercices.length > 3 ? '…' : ''}</div></div>
-          <button class="go" data-day="${i}" aria-label="Commencer">→</button></div>`).join('')}` : `
-      <div class="wk-card" style="background:var(--teal-soft)">${ART[0]}<div><div class="nm">Ton programme arrive</div>
-        <div class="meta">Il sera créé sur mesure après l'analyse de ton corps, puis importé dans Profil → Programme.</div></div></div>`}
-    <button class="btn coral block" id="free" style="margin:6px 0 4px">+ Séance libre</button>
+          <div>${j.jourSemaine != null ? `<div class="small" style="font-weight:700;opacity:.65">${DAY_NAMES[j.jourSemaine]}${j.jourSemaine === new Date().getDay() ? ' · AUJOURD\'HUI' : ''}</div>` : ''}<div class="nm">${esc(j.nom)}</div><div class="meta">${j.exercices.length} exercices · ${j.exercices.slice(0, 3).map(e => esc(e.nom)).join(', ')}${j.exercices.length > 3 ? '…' : ''}</div></div>
+          <button class="go" data-day="${i}" aria-label="Commencer">→</button></div>`).join('')}` : ''}
+
+    <div class="sec-title"><span>Jiu-jitsu</span></div>
+    ${[[3, 'Mercredi', '1 h'], [0, 'Dimanche', '2 h']].map(([wd, n, d], i) => `<div class="wk-card" style="background:${i ? 'var(--lilac-soft)' : 'var(--blue-soft)'}">${ART[3]}
+        ${wd === new Date().getDay() && jjbToday ? '<span class="pill tag">Fait ✓</span>' : ''}
+        <div><div class="small" style="font-weight:700;opacity:.65">${n}${wd === new Date().getDay() ? ' · AUJOURD\'HUI' : ''}</div><div class="nm">Jiu-jitsu (${d})</div>
+        <div class="meta">${i ? 'Plus long : le soir, 2e portion de féculents permise.' : 'Ton cardio de la semaine.'}</div></div>
+        <button class="go" data-jjb="${wd}" aria-label="Enregistrer">✓</button></div>`).join('')}
+
+    <div class="row" style="gap:10px;margin:6px 0 4px"><button class="btn coral" id="free" style="flex:1">+ Séance libre</button><button class="btn" id="jjb-add" style="flex:1">🥋 + Jiu-jitsu</button></div>
+    <div class="card small"><b>Comment progresser :</b> quand tu fais le haut de la fourchette sur toutes les séries, augmente la charge la fois suivante (+2,5 kg jambes et dos, +1 à 2 kg le reste). Garde toujours 1 à 2 répétitions en réserve.</div>
 
     <div class="card"><h2>Historique</h2>
-      ${workouts.length ? workouts.slice(0, 40).map((w, i) => {
+      ${workouts.length ? workouts.slice(0, 50).map((w, i) => {
+        if (!isGym(w)) return `<div class="list-row hist" data-id="${w.id}"><span class="icn" style="background:var(--lilac-soft)">🥋</span>
+          <div style="flex:1;min-width:0"><b>${esc(w.name)}</b><div class="small muted">${fmtDay(w.date)} · ${w.duration || '?'} min · intensité ${w.intensity || '?'}/5</div></div></div>`;
         const done = (w.exercises || []).reduce((a, e) => a + e.sets.filter(s => s.done).length, 0);
         const vol = (w.exercises || []).reduce((a, e) => a + e.sets.filter(s => s.done).reduce((b, s) => b + (num(s.weight) || 0) * (num(s.reps) || 0), 0), 0);
         return `<div class="list-row hist" data-id="${w.id}"><span class="icn" style="background:${BG[i % BG.length]}">🏋️</span>
@@ -1614,12 +1705,94 @@ VIEWS.train = async () => {
     ${recs.length ? `<div class="card yellow"><h2>Records 🏆</h2><table><tr><th>Exercice</th><th>Meilleure série</th><th>1RM est.</th></tr>
       ${recs.map(r => `<tr><td>${esc(r.name)}</td><td class="pr">${r.weight} × ${r.reps}</td><td>${Math.round(r.e1rm)} kg</td></tr>`).join('')}</table></div>` : ''}
   `;
+  bindSegTrain();
   view().querySelectorAll('[data-day]').forEach(b => b.onclick = async () => { await startSession(program.jours[+b.dataset.day]); go('train'); });
+  view().querySelectorAll('[data-jjb]').forEach(b => b.onclick = () => {
+    // Le jour J (ou le dernier mercredi/dimanche passé)
+    let d = new Date(); for (let i = 0; i < 7 && d.getDay() !== +b.dataset.jjb; i++) d = addDays(d, -1);
+    jjbSheet(dateKey(d));
+  });
+  $('#jjb-add').onclick = () => jjbSheet(today);
   $('#free').onclick = async () => { await startSession(null); go('train'); };
   view().querySelectorAll('.hist').forEach(el => el.onclick = () => workoutDetail(workouts.find(w => w.id === el.dataset.id)));
 };
 
+async function renderAgenda() {
+  const workouts = await dbAll('workouts');
+  const byDate = {};
+  workouts.forEach(w => (byDate[w.date] = byDate[w.date] || []).push(w));
+  const today = dateKey();
+  if (!agendaMonth) agendaMonth = (today < PROG_START ? PROG_START : today > PROG_END ? PROG_END : today).slice(0, 7);
+  const [y, m] = agendaMonth.split('-').map(Number);
+  const first = new Date(y, m - 1, 1), daysIn = new Date(y, m, 0).getDate();
+  const lead = (first.getDay() + 6) % 7;
+  const monthName = first.toLocaleDateString('fr-BE', { month: 'long', year: 'numeric' });
+  const canPrev = agendaMonth > PROG_START.slice(0, 7), canNext = agendaMonth < PROG_END.slice(0, 7);
+
+  const status = k => {
+    const p = planFor(k), ws = byDate[k] || [];
+    const gymDone = ws.some(isGym), jjbDone = ws.some(w => !isGym(w));
+    const done = p.kind === 'gym' ? gymDone : p.kind === 'jjb' ? jjbDone : false;
+    return { p, gymDone, jjbDone, done, missed: !done && k < today && (p.kind === 'gym' || p.kind === 'jjb') };
+  };
+  let cells = '';
+  for (let i = 0; i < lead; i++) cells += '<div class="cal-d empty"></div>';
+  for (let d = 1; d <= daysIn; d++) {
+    const k = `${y}-${pad(m)}-${pad(d)}`, s = status(k);
+    cells += `<div class="cal-d ${s.p.kind} ${k === today ? 'today' : ''} ${s.done ? 'done' : ''} ${s.missed ? 'missed' : ''} ${s.p.deload ? 'deload' : ''}" data-k="${k}">
+      <span class="cn">${d}</span><span class="ci">${s.done ? '✓' : s.p.kind === 'gym' ? s.p.seance.nom.slice(-1) : s.p.kind === 'jjb' ? '🥋' : ''}</span>${s.p.checkin ? '<span class="cc">📸</span>' : ''}${(s.gymDone && s.p.kind !== 'gym') || (s.jjbDone && s.p.kind !== 'jjb') ? '<span class="cx">+</span>' : ''}</div>`;
+  }
+  // Liste de la semaine en cours
+  const ws0 = weekStart(parseKey(today < PROG_START ? PROG_START : today));
+  const week = [...Array(7)].map((_, i) => dateKey(addDays(ws0, i))).map(k => {
+    const s = status(k);
+    return `<div class="list-row agenda-row" data-k="${k}"><span class="icn" style="background:${s.p.kind === 'gym' ? 'var(--teal-soft)' : s.p.kind === 'jjb' ? 'var(--lilac-soft)' : 'var(--card2)'}">${s.p.ico}</span>
+      <div style="flex:1;min-width:0"><b style="text-transform:capitalize">${fmtDay(k)}</b><div class="small muted">${esc(s.p.label)}${s.p.checkin ? ' · 📸 check-in' : ''}${s.p.deload ? ' · allégée' : ''}</div></div>
+      <span class="small" style="font-weight:800;color:${s.done ? 'var(--teal-d)' : s.missed ? 'var(--bad)' : 'var(--muted)'}">${s.done ? 'Fait ✓' : s.missed ? 'Manqué' : k === today ? "Aujourd'hui" : ''}</span></div>`;
+  }).join('');
+
+  view().innerHTML = segTrain() + `
+    <div class="card">
+      <div class="row between"><button class="btn sm ghost" id="cal-p" ${canPrev ? '' : 'disabled style="opacity:.3"'}>‹</button>
+        <h2 style="margin:0;text-transform:capitalize">${monthName}</h2>
+        <button class="btn sm ghost" id="cal-n" ${canNext ? '' : 'disabled style="opacity:.3"'}>›</button></div>
+      <div class="cal-h">${['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(x => `<span>${x}</span>`).join('')}</div>
+      <div class="cal">${cells}</div>
+      <div class="cal-legend small muted"><span><i class="lg gym"></i>Salle A/B/C</span><span><i class="lg jjb"></i>Jiu-jitsu</span><span><i class="lg rest"></i>Repos</span><span>📸 Check-in</span><span><i class="lg done"></i>Fait</span></div>
+    </div>
+    <div class="card"><h2>Cette semaine</h2>${week}</div>
+    <div class="card small muted">Semaine allégée du 11 au 17 janvier · Fêtes du 24 déc. au 1er janv. · Fin du programme le 10 mars.</div>`;
+  bindSegTrain();
+  const shift = n => { const d = new Date(y, m - 1 + n, 1); agendaMonth = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; go('train'); };
+  if (canPrev) $('#cal-p').onclick = () => shift(-1);
+  if (canNext) $('#cal-n').onclick = () => shift(1);
+  view().querySelectorAll('[data-k]').forEach(el => el.onclick = () => daySheet(el.dataset.k, status(el.dataset.k), byDate[el.dataset.k] || []));
+}
+
+function daySheet(k, s, ws) {
+  const p = s.p;
+  const items = ws.map(w => `<div class="list-row hist2" data-id="${w.id}"><span class="icn" style="background:${isGym(w) ? 'var(--teal-soft)' : 'var(--lilac-soft)'}">${isGym(w) ? '🏋️' : '🥋'}</span><div style="flex:1"><b>${esc(w.name)}</b><div class="small muted">${w.duration ? w.duration + ' min' : ''}</div></div><span class="small muted">voir ›</span></div>`).join('');
+  const canAct = k <= dateKey();
+  openSheet(`<h2 style="text-transform:capitalize">${fmtDay(k)}</h2>
+    <div class="muted small">${p.inProg ? `Semaine ${progWeek(k)}/17${phaseOf(k) ? ` · Phase ${phaseOf(k).n} : ${esc(phaseOf(k).nom)}` : ''}` : esc(p.label)}</div>
+    <div class="card ${p.kind === 'gym' ? 'mint' : p.kind === 'jjb' ? 'lilac' : ''}" style="margin-top:12px"><div style="font-size:17px;font-weight:800">${p.ico} ${esc(p.label)}</div>
+      ${p.kind === 'gym' ? `<div class="small muted" style="margin-top:4px">${p.seance.exercices.map(e => esc(e.nom)).join(' · ')}</div>` : ''}
+      ${p.deload ? '<div class="small" style="margin-top:6px;font-weight:700">Semaine allégée : une série de moins.</div>' : ''}
+      ${p.checkin ? '<div class="small" style="margin-top:6px;font-weight:700">📸 Check-in : balance Basic-Fit, tour de taille, photos.</div>' : ''}
+      ${p.festive ? '<div class="small" style="margin-top:6px">🎄 Fêtes : profite, garde les protéines et la salle.</div>' : ''}</div>
+    ${items ? `<h3>Enregistré</h3>${items}` : ''}
+    <div class="sheet-actions">
+      ${canAct && p.kind === 'gym' && !s.gymDone && k === dateKey() ? '<button class="btn primary" id="ds-go">Commencer la séance</button>' : ''}
+      ${canAct ? '<button class="btn" id="ds-jjb">🥋 + Jiu-jitsu</button>' : ''}
+      <button class="btn ghost" id="ds-c">Fermer</button></div>`);
+  $('#ds-c').onclick = closeSheet;
+  const goB = $('#ds-go'); if (goB) goB.onclick = async () => { closeSheet(); await startSession(p.seance); trainMode = 'seances'; go('train'); };
+  const jb = $('#ds-jjb'); if (jb) jb.onclick = () => jjbSheet(k);
+  document.querySelectorAll('.hist2').forEach(el => el.onclick = () => workoutDetail(ws.find(w => w.id === el.dataset.id)));
+}
+
 function workoutDetail(w) {
+  if (w && w.type === 'jjb') return jjbSheet(null, w);
   openSheet(`<h2>${esc(w.name)}</h2><div class="muted small">${fmtDay(w.date)}${w.duration ? ' · ' + w.duration + ' min' : ''}</div>
     ${(w.exercises || []).map(e => `<div class="ex"><b>${esc(e.name)}</b>
       <div class="small" style="margin-top:6px">${e.sets.filter(s => s.done).map(s => `<span class="chip">${s.weight || 0} kg × ${s.reps || 0}</span>`).join('') || '<span class="muted">aucune série validée</span>'}</div></div>`).join('')}
