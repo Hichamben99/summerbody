@@ -173,8 +173,36 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal);bo
 .set .ok{height:44px;border-radius:14px;border:1.5px solid rgba(29,43,40,.1);background:#fff;color:var(--muted);font-size:18px}
 .set .ok.done{background:var(--teal);color:#fff;border-color:transparent;box-shadow:0 6px 14px rgba(43,179,154,.3)}
 .prev{font-size:12px;color:var(--muted);margin-top:4px}
-.timer{position:sticky;top:76px;z-index:3;background:var(--text);color:#fff;border-radius:20px;padding:12px 16px;font-weight:750;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;box-shadow:0 10px 24px rgba(29,43,40,.25)}
-.timer .btn{background:rgba(255,255,255,.15);color:#fff;box-shadow:none}
+#timer-slot{position:sticky;top:calc(78px + env(safe-area-inset-top));z-index:5}
+a.btn{text-decoration:none;display:flex;justify-content:center}
+.timer{background:var(--text);color:#fff;border-radius:22px;padding:10px 12px;font-weight:750;display:flex;gap:12px;align-items:center;margin-bottom:6px;box-shadow:0 10px 24px rgba(29,43,40,.25);transition:background .2s}
+.timer.hot{background:#e8664a}
+.timer .btn{background:rgba(255,255,255,.15);color:#fff;box-shadow:none;padding:8px 10px}
+.t-ring{--p:0;flex:none;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#7fe0c9 calc(var(--p)*1%),rgba(255,255,255,.14) 0)}
+.t-num{width:50px;height:50px;border-radius:50%;background:inherit;display:grid;place-items:center;font-size:17px;font-variant-numeric:tabular-nums;background:var(--text)}
+.timer.hot .t-num{background:#e8664a}
+.t-mid{flex:1;min-width:0}
+.t-lbl{font-size:13px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.t-bar{height:6px;border-radius:6px;background:rgba(255,255,255,.15);margin-top:7px;overflow:hidden}
+.t-bar i{display:block;height:100%;background:#7fe0c9;border-radius:6px;transition:width .25s linear}
+.t-btns{display:flex;flex-direction:column;gap:6px}
+.ex-top{display:flex;gap:12px;align-items:flex-start}
+.demo-th{position:relative;flex:none;width:104px;padding:0;border:0;background:none;border-radius:14px;cursor:pointer}
+.demo-th .play{position:absolute;right:6px;bottom:6px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.92);color:var(--teal,#2bb39a);font-size:10px;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.anim{position:relative;display:block;width:100%;aspect-ratio:3/2;overflow:hidden;border-radius:14px;background:#eef3f1}
+.anim img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.anim.flip img+img{animation:demoflip 2.2s ease-in-out infinite}
+@keyframes demoflip{0%,38%{opacity:0}50%,88%{opacity:1}100%{opacity:0}}
+.anim .ph{display:none}
+.anim.off img{display:none}.anim.off .ph,.anim.none span{display:grid;place-items:center;position:absolute;inset:0;font-size:22px;opacity:.6}
+.anim.big{border-radius:18px;margin-top:10px}
+.anim.mini{width:64px;flex:none;border-radius:10px}
+.cues{margin:12px 0 0;padding-left:20px;line-height:1.55;font-size:14px}
+.cues li{margin-bottom:4px}
+.link-btn{background:none;border:0;padding:4px 0 0;color:var(--teal,#2bb39a);font-weight:700;cursor:pointer}
+.demo-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.demo-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.7);border:0;border-radius:14px;padding:6px 10px 6px 6px;text-align:left;cursor:pointer;color:inherit;font:inherit}
+.demo-row>span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column}
 .pr{color:var(--peach-d);font-weight:800}
 .list-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);gap:10px}
 .list-row:last-child{border-bottom:0}
@@ -210,7 +238,7 @@ details summary{cursor:pointer}
 #c-prevwrap[hidden]{display:none}
 #c-prev{height:70px;border-radius:12px;display:block}
 #c-rm{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;border:0;background:var(--text);color:#fff;font-size:15px}
-html,body{overflow-x:hidden}
+html,body{overflow-x:clip}
 .stat{min-width:0;overflow:hidden}
 .stat .v{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .qa button{min-height:66px;line-height:1.25}
@@ -348,7 +376,7 @@ html,body{overflow-x:hidden}
 'use strict';
 /* Summer Body — appli de suivi 100 % locale (IndexedDB). Aucune donnée ne quitte le téléphone. */
 
-const APP_VERSION = '2.1.0';
+const APP_VERSION = '2.2.0';
 
 /* ---------------- Base de données locale ---------------- */
 const DB_NAME = 'summerbody';
@@ -613,6 +641,68 @@ const PROGRAMME_SB = {
   ],
 };
 const WARMUP = ['3 min de vélo ou de rameur, intensité modérée', 'Mobilité : 10 rotations thoraciques / côté, 10 « 90/90 » de hanches, 10 cercles d\'épaules à l\'élastique', 'Activation : 10 ponts fessiers, 10 face pull légers', 'Montée en charge sur le 1er gros exercice : à vide, 50 %, 75 %'];
+/* ---------------- Démos animées des exercices (images Free Exercise DB, domaine public) ---------------- */
+const DEMO_BASE = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/';
+const DEMO_VER = 'demos-1';
+const DEMOS = [
+  [/tirage.*serr|close.grip.*pulldown/, 'Close-Grip_Front_Lat_Pulldown', ['Assis, cuisses calées sous les boudins, buste légèrement incliné en arrière.', 'Tire la poignée vers le haut de la poitrine en descendant les coudes le long du corps.', 'Remonte lentement jusqu\'à l\'étirement du dos, sans lâcher les épaules vers les oreilles.']],
+  [/tirage vertical|lat pulldown|traction/, 'Wide-Grip_Lat_Pulldown', ['Mains un peu plus larges que les épaules, poitrine sortie.', 'Tire la barre vers le haut de la poitrine en pensant « coudes vers les poches ».', 'Pas d\'élan avec le buste ; remonte en 2 secondes jusqu\'aux bras tendus.']],
+  [/hack squat/, 'Hack_Squat', ['Dos bien plaqué contre le dossier, pieds largeur d\'épaules.', 'Descends jusqu\'à cuisses parallèles, genoux dans l\'axe des pieds.', 'Pousse sur tout le pied, sans verrouiller les genoux en haut.']],
+  [/bulgare|split squat|fente/, 'One_Leg_Barbell_Squat', ['Pied arrière posé sur le banc, pied avant à un grand pas devant.', 'Descends à la verticale jusqu\'à ce que le genou arrière frôle le sol.', 'Genou avant dans l\'axe du pied, buste fier ; remonte en poussant sur le talon avant.']],
+  [/smith.*squat/, 'Smith_Machine_Squat', ['Pieds légèrement devant la barre, largeur d\'épaules.', 'Descends jusqu\'à cuisses parallèles, dos neutre.', 'Remonte en poussant le sol, genoux qui ne rentrent pas.']],
+  [/squat/, 'Barbell_Squat', ['Barre sur les trapèzes, pieds largeur d\'épaules, pointes légèrement ouvertes.', 'Inspire, gaine, et descends hanches en arrière jusqu\'à cuisses au moins parallèles.', 'Genoux dans l\'axe des pieds, dos neutre ; remonte en poussant tout le pied.']],
+  [/couche barre|bench press/, 'Barbell_Bench_Press_-_Medium_Grip', ['Omoplates serrées et basses, pieds ancrés au sol, légère cambrure naturelle.', 'Descends la barre contrôlée vers le bas des pectoraux, coudes à ~45°.', 'Pousse la barre en remontant légèrement vers les yeux, sans décoller les fesses.']],
+  [/incline/, 'Incline_Dumbbell_Press', ['Banc à 30°, omoplates serrées, haltères au niveau du haut des pecs.', 'Pousse vers le haut en rapprochant légèrement les haltères.', 'Redescends lentement jusqu\'à sentir l\'étirement des pectoraux.']],
+  [/couche halteres|dumbbell bench/, 'Dumbbell_Bench_Press', ['Allongé, omoplates serrées, haltères au-dessus de la poitrine.', 'Descends en ouvrant les coudes à ~45° jusqu\'au niveau de la poitrine.', 'Pousse en gardant les poignets bien droits au-dessus des coudes.']],
+  [/chest press/, 'Leverage_Chest_Press', ['Règle le siège pour que les poignées soient au milieu de la poitrine.', 'Pousse sans verrouiller les coudes, omoplates collées au dossier.', 'Reviens lentement jusqu\'à l\'étirement des pecs.']],
+  [/shoulder press.*machine|machine.*shoulder/, 'Machine_Shoulder_Military_Press', ['Dos collé au dossier, poignées à hauteur d\'épaules.', 'Pousse vers le haut sans cambrer le bas du dos.', 'Redescends contrôlé jusqu\'aux oreilles.']],
+  [/militaire|shoulder press|developpe epaules/, 'Dumbbell_Shoulder_Press', ['Assis, dos droit, haltères à hauteur des oreilles, paumes vers l\'avant.', 'Pousse vers le haut en gainant les abdos, sans cambrer.', 'Redescends lentement jusqu\'au niveau des oreilles.']],
+  [/rowing haltere|dumbbell row/, 'One-Arm_Dumbbell_Row', ['Genou et main en appui sur le banc, dos plat parallèle au sol.', 'Tire l\'haltère vers la hanche, coude près du corps.', 'Serre l\'omoplate en haut, redescends bras tendu sans tourner le buste.']],
+  [/rowing.*(poulie|assis)|cable row|rowing machine/, 'Seated_Cable_Rows', ['Assis, genoux légèrement fléchis, dos droit.', 'Tire la poignée vers le nombril en serrant les omoplates.', 'Reviens en tendant les bras sans arrondir le dos ni balancer le buste.']],
+  [/marteau|hammer/, 'Hammer_Curls', ['Debout, paumes face à face, coudes collés au corps.', 'Monte les haltères sans bouger les coudes.', 'Redescends en 2 secondes, sans élan.']],
+  [/curl/, 'Dumbbell_Bicep_Curl', ['Debout, coudes collés au corps, paumes vers l\'avant.', 'Monte en contractant les biceps, sans balancer le buste.', 'Redescends lentement jusqu\'aux bras presque tendus.']],
+  [/pallof/, 'Pallof_Press', ['De profil à la poulie, poignée contre la poitrine, pieds largeur de bassin.', 'Tends les bras devant toi en résistant à la rotation.', 'Tiens 1 seconde, reviens à la poitrine ; le buste ne tourne jamais.']],
+  [/roumain|romanian|sdt/, 'Romanian_Deadlift', ['Debout, barre contre les cuisses, genoux légèrement fléchis.', 'Pousse les hanches en arrière, la barre glisse le long des cuisses, dos plat.', 'Stop à l\'étirement des ischios, puis remonte en serrant les fessiers.']],
+  [/elevations? laterales?|lateral raise/, 'Side_Lateral_Raise', ['Debout, haltères le long du corps, coudes légèrement fléchis.', 'Monte les bras sur les côtés jusqu\'à hauteur d\'épaules, pas plus haut.', 'Pense « coudes qui montent », redescends lentement.']],
+  [/triceps|pushdown/, 'Triceps_Pushdown', ['Face à la poulie, coudes collés au corps.', 'Pousse la barre vers le bas jusqu\'aux bras tendus.', 'Remonte sans décoller les coudes, jusqu\'à 90°.']],
+  [/farmer/, 'Farmers_Walk', ['Prends des haltères lourds, épaules basses, buste droit.', 'Marche à petits pas rapides, abdos gainés.', 'Ne laisse pas les haltères taper les jambes ; serre fort les poignées.']],
+  [/presse|leg press/, 'Leg_Press', ['Dos et fesses collés au dossier, pieds largeur d\'épaules au milieu de la plateforme.', 'Descends jusqu\'à ~90° aux genoux sans décoller le bas du dos.', 'Pousse sur tout le pied, sans verrouiller les genoux.']],
+  [/face pull/, 'Face_Pull', ['Poulie à hauteur du visage, corde en main, pouces vers l\'arrière.', 'Tire la corde vers le front en écartant les mains.', 'Coudes hauts, serre les omoplates 1 seconde, reviens lentement.']],
+  [/dead hang|suspension/, 'Scapular_Pull-Up', ['Prise largeur d\'épaules, bras tendus, pieds dans le vide.', 'Épaules légèrement engagées (pas complètement relâchées), abdos gainés.', 'Respire calmement et tiens le plus longtemps possible.'], [0]],
+  [/gainage|planche|plank/, 'Plank', ['Coudes sous les épaules, corps aligné de la tête aux talons.', 'Serre les fessiers et les abdos, ne creuse pas le dos.', 'Respire normalement et tiens la position.']],
+  [/leg extension|extension.*jambes/, 'Leg_Extensions', ['Genoux alignés avec l\'axe de la machine, dos calé.', 'Tends les jambes complètement, contracte 1 seconde.', 'Redescends lentement.']],
+  [/leg curl|ischios/, 'Lying_Leg_Curls', ['Allongé, boudin juste au-dessus des talons.', 'Ramène les talons vers les fesses sans décoller les hanches.', 'Redescends lentement.']],
+];
+const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+function demoFor(name) {
+  const n = norm(name); const d = DEMOS.find(x => x[0].test(n)); if (!d) return null;
+  const frames = d[3] || [0, 1];
+  return { id: d[1], cues: d[2], urls: frames.map(f => `${DEMO_BASE}${d[1]}/${f}.jpg`) };
+}
+function demoAnim(d, cls = '') {
+  if (!d) return `<span class="anim none ${cls}"><span>🏋️</span></span>`;
+  return `<span class="anim ${d.urls.length > 1 ? 'flip' : ''} ${cls}">${d.urls.map(u => `<img src="${u}" alt="" crossorigin="anonymous" loading="lazy" onerror="this.parentNode.classList.add('off')">`).join('')}<span class="ph">📶</span></span>`;
+}
+function demoSheet(name, tip) {
+  const d = demoFor(name);
+  openSheet(`<h2>${esc(name)}</h2>
+    ${d ? demoAnim(d, 'big') : '<div class="muted small">Pas encore d\'animation pour cet exercice : regarde les vidéos ci-dessous.</div>'}
+    ${d ? `<ol class="cues">${d.cues.map(c => `<li>${esc(c)}</li>`).join('')}</ol>` : ''}
+    ${tip ? `<div class="card yellow small" style="margin-top:10px">💡 ${esc(tip)}</div>` : ''}
+    <a class="btn block" style="margin-top:12px" href="https://www.youtube.com/results?search_query=${encodeURIComponent(name + ' exécution technique')}" target="_blank" rel="noopener">▶ Voir des vidéos de l'exercice (YouTube)</a>
+    ${d ? '<div class="small muted" style="margin-top:8px;text-align:center">Animation : Free Exercise DB (domaine public)</div>' : ''}
+    <div class="sheet-actions"><button class="btn ghost" id="dm-c" style="flex:1">Fermer</button></div>`);
+  $('#dm-c').onclick = closeSheet;
+}
+async function prefetchDemos() {
+  try {
+    if (!navigator.onLine || (await getSetting('demosCached')) === DEMO_VER) return;
+    const urls = [...new Set(DEMOS.flatMap(d => (d[3] || [0, 1]).map(f => `${DEMO_BASE}${d[1]}/${f}.jpg`)))];
+    const res = await Promise.all(urls.map(u => fetch(u, { mode: 'cors' }).then(r => r.ok).catch(() => false)));
+    if (res.every(Boolean)) await setSetting('demosCached', DEMO_VER);
+  } catch { }
+}
+
 const NUTRI_CONTEXT_SB = `Programme Summer Body (16 nov. 2026 → 10 mars 2027). Départ InBody 20/09 : 72,7 kg, 20,4 % de masse grasse, 32,9 kg de muscle squelettique, gras surtout au tronc (7,6 kg, 185 % de la norme), graisse viscérale 56,7 cm² (sain). Basic-Fit 13/11 : 73,3 kg, 19 % de masse grasse. Il se mesure désormais uniquement sur la balance Basic-Fit. Objectif : 13–15 % de masse grasse, +1,5 à 2,5 kg de muscle, poids ~70–71 kg (recomposition). Entraînement : salle lundi/jeudi/samedi, jiu-jitsu mercredi (1 h) et dimanche (2 h), 8 000–10 000 pas/jour. Il mange les repas de ses parents : il ne contrôle pas les recettes, il joue sur les portions et les ajouts. Protéines : ~140 g/jour (portion de viande/poisson/œufs grande comme la main à chaque repas + 1–2 boosters : skyr 250 g, 3 œufs, thon, whey). Assiette : ½ légumes, ¼ protéines, ¼ féculents ; pas de 2e assiette de féculents sauf après le jiu-jitsu du dimanche. Pain 1–2 morceaux max, moins de sauce/huile, uniquement eau/thé/café sans sucre, grignotages remplacés par fruit/skyr/amandes. Calories : phase 1 (16 nov.–13 déc.) maintenance ~2 600 ; phase 2 (14 déc.–21 fév.) ~2 300 ; phase 3 (22 fév.–10 mars) ~2 100–2 200. Fêtes 24 déc.–1er janv. : profiter sans culpabiliser, garder protéines et salle.`;
 
 const daysBetween = (a, b) => Math.round((parseKey(b) - parseKey(a)) / 864e5);
@@ -1776,7 +1866,7 @@ function daySheet(k, s, ws) {
   openSheet(`<h2 style="text-transform:capitalize">${fmtDay(k)}</h2>
     <div class="muted small">${p.inProg ? `Semaine ${progWeek(k)}/17${phaseOf(k) ? ` · Phase ${phaseOf(k).n} : ${esc(phaseOf(k).nom)}` : ''}` : esc(p.label)}</div>
     <div class="card ${p.kind === 'gym' ? 'mint' : p.kind === 'jjb' ? 'lilac' : ''}" style="margin-top:12px"><div style="font-size:17px;font-weight:800">${p.ico} ${esc(p.label)}</div>
-      ${p.kind === 'gym' ? `<div class="small muted" style="margin-top:4px">${p.seance.exercices.map(e => esc(e.nom)).join(' · ')}</div>` : ''}
+      ${p.kind === 'gym' ? `<div class="demo-list">${p.seance.exercices.map((e, i) => `<button class="demo-row" data-dx="${i}">${demoAnim(demoFor(e.nom), 'mini')}<span><b>${esc(e.nom)}</b><span class="small muted">${e.series}×${esc(e.reps || '')}</span></span><span class="muted">›</span></button>`).join('')}</div>` : ''}
       ${p.deload ? '<div class="small" style="margin-top:6px;font-weight:700">Semaine allégée : une série de moins.</div>' : ''}
       ${p.checkin ? '<div class="small" style="margin-top:6px;font-weight:700">📸 Check-in : balance Basic-Fit, tour de taille, photos.</div>' : ''}
       ${p.festive ? '<div class="small" style="margin-top:6px">🎄 Fêtes : profite, garde les protéines et la salle.</div>' : ''}</div>
@@ -1788,6 +1878,7 @@ function daySheet(k, s, ws) {
   $('#ds-c').onclick = closeSheet;
   const goB = $('#ds-go'); if (goB) goB.onclick = async () => { closeSheet(); await startSession(p.seance); trainMode = 'seances'; go('train'); };
   const jb = $('#ds-jjb'); if (jb) jb.onclick = () => jjbSheet(k);
+  document.querySelectorAll('[data-dx]').forEach(el => el.onclick = () => { const e = p.seance.exercices[+el.dataset.dx]; demoSheet(e.nom, e.conseil); });
   document.querySelectorAll('.hist2').forEach(el => el.onclick = () => workoutDetail(ws.find(w => w.id === el.dataset.id)));
 }
 
@@ -1807,6 +1898,8 @@ function persistSession(s) { clearTimeout(saveSessTimer); saveSessTimer = setTim
 
 async function renderSession(s) {
   const workouts = await dbAll('workouts');
+  restPrefs = { ...REST_DEF, ...(await getSetting('restPrefs', {})) };
+  keepAwake();
   const records = computeRecords(workouts);
   view().innerHTML = `
     <div id="timer-slot"></div>
@@ -1838,9 +1931,16 @@ async function renderSession(s) {
         const key = s.exercises[ei].name.trim().toLowerCase();
         const e1 = est1RM(num(st.weight) || 0, num(st.reps) || 0);
         if (e1 > 0 && (!records[key] || e1 > records[key].e1rm)) { toast('🏆 Nouveau record sur ' + s.exercises[ei].name + ' !', 3000); navigator.vibrate && navigator.vibrate([60, 40, 60]); }
-        startRest(s.exercises[ei].rest || 90);
+        const ex = s.exercises[ei];
+        if (ex.sets.every(x => x.done)) {
+          const next = s.exercises.find((x, i) => i > ei && x.sets.some(y => !y.done)) || s.exercises.find(x => x.sets.some(y => !y.done));
+          if (next) startRest(restPrefs.ex, 'Prochain exercice : ' + next.name);
+          else { stopRest(); toast('💪 Toutes les séries sont faites ! Termine la séance en bas.', 3500); }
+        } else startRest(restPrefs.set, `Repos · prochaine série : ${ex.sets.filter(x => x.done).length + 1}/${ex.sets.length}`);
       }
       persistSession(s);
+    } else if (b.dataset.act === 'demo') {
+      demoSheet(s.exercises[ei].name, s.exercises[ei].tip);
     } else if (b.dataset.act === 'addset') {
       const sets = s.exercises[ei].sets; const l = sets[sets.length - 1] || {};
       sets.push({ weight: l.weight || '', reps: l.reps || '', done: false }); persistSession(s); renderSession(s);
@@ -1866,14 +1966,14 @@ async function renderSession(s) {
     };
   };
   $('#s-cancel').onclick = async () => {
-    if (await confirmSheet('Abandonner cette séance ? Rien ne sera enregistré.', 'Abandonner')) { await setSetting('activeSession', null); stopRest(); go('train'); }
+    if (await confirmSheet('Abandonner cette séance ? Rien ne sera enregistré.', 'Abandonner')) { await setSetting('activeSession', null); stopRest(); releaseAwake(); go('train'); }
   };
   $('#s-finish').onclick = async () => {
     clearTimeout(saveSessTimer);
     const doneSets = s.exercises.reduce((a, e) => a + e.sets.filter(x => x.done).length, 0);
     if (!doneSets && !(await confirmSheet("Aucune série validée (✓). Enregistrer quand même ?", 'Enregistrer', false))) return;
     const w = { ...s, duration: Math.max(1, Math.round((Date.now() - s.ts) / 60000)) };
-    await dbPut('workouts', w); await setSetting('activeSession', null); stopRest();
+    await dbPut('workouts', w); await setSetting('activeSession', null); stopRest(); releaseAwake();
     const after = computeRecords(await dbAll('workouts'));
     const newPR = Object.keys(after).filter(k => !records[k] || after[k].e1rm > records[k].e1rm).length;
     openSheet(`<div style="text-align:center;padding:10px 0"><div style="font-size:56px">🔥</div><h2>Séance terminée !</h2>
@@ -1888,8 +1988,12 @@ async function renderSession(s) {
 function exHTML(e, ei, workouts) {
   const lp = lastPerf(workouts, e.name);
   return `<div class="ex">
-    <div class="ex-head"><b>${esc(e.name)}</b><span class="small muted">${esc(e.target || '')}${e.rest ? ` · repos ${e.rest}s` : ''}</span></div>
-    ${e.tip ? `<div class="small muted" style="margin-top:4px">💡 ${esc(e.tip)}</div>` : ''}
+    <div class="ex-top"><button class="demo-th" data-ei="${ei}" data-act="demo" aria-label="Voir la démo">${demoAnim(demoFor(e.name))}<span class="play">▶</span></button>
+      <div style="flex:1;min-width:0"><div class="ex-head"><b>${esc(e.name)}</b></div>
+      <div class="small muted">${esc(e.target || '')}</div>
+      <div class="small muted">⏱️ ${fmtRest(restPrefs.set)} entre séries · ${fmtRest(restPrefs.ex)} avant l'exo suivant</div>
+      <button class="link-btn small" data-ei="${ei}" data-act="demo">Voir comment faire ›</button></div></div>
+    ${e.tip ? `<div class="small muted" style="margin-top:6px">💡 ${esc(e.tip)}</div>` : ''}
     ${lp ? `<div class="prev">Dernière fois (${fmtShort(lp.date)}) : ${lp.sets.map(s => `${s.weight || 0}×${s.reps || 0}`).join(', ') || '—'}</div>` : ''}
     <div class="set small muted" style="margin-top:8px"><span class="n">#</span><span style="text-align:center">kg</span><span style="text-align:center">reps</span><span></span></div>
     ${e.sets.map((st, si) => `<div class="set"><span class="n">${si + 1}</span>
@@ -1904,16 +2008,53 @@ function exHTML(e, ei, workouts) {
     </div></div>`;
 }
 
-function startRest(sec) { restTimer = { end: Date.now() + sec * 1000, iv: restTimer && restTimer.iv }; if (!restTimer.iv) restTimer.iv = setInterval(renderTimer, 500); renderTimer(); }
+const REST_DEF = { set: 30, ex: 90 };
+let restPrefs = { ...REST_DEF };
+const fmtRest = sec => sec >= 60 ? `${Math.floor(sec / 60)} min${sec % 60 ? ' ' + pad(sec % 60) : ''}` : `${sec} s`;
+let audioCtx = null, wakeLock = null;
+function beep(freq = 880, dur = 0.12, vol = 0.25) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.frequency.value = freq; o.type = 'sine'; g.gain.value = vol;
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + dur);
+  } catch { }
+}
+async function keepAwake() { try { if ('wakeLock' in navigator && (!wakeLock || wakeLock.released)) wakeLock = await navigator.wakeLock.request('screen'); } catch { } }
+function releaseAwake() { try { wakeLock && wakeLock.release(); } catch { } wakeLock = null; }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { if ($('#timer-slot')) keepAwake(); if (restTimer) renderTimer(); } });
+
+function startRest(sec, label = 'Repos') {
+  if (restTimer && restTimer.iv) clearInterval(restTimer.iv);
+  restTimer = { end: Date.now() + sec * 1000, total: sec, label, last: null, iv: setInterval(renderTimer, 250) };
+  beep(660, 0.05, 0.01); // débloque le son sur mobile
+  renderTimer();
+}
 function stopRest() { if (restTimer && restTimer.iv) clearInterval(restTimer.iv); restTimer = null; const s = $('#timer-slot'); if (s) s.innerHTML = ''; }
 function renderTimer() {
   const slot = $('#timer-slot'); if (!slot || !restTimer) { if (!slot && restTimer) { clearInterval(restTimer.iv); restTimer = null; } return; }
   const left = Math.ceil((restTimer.end - Date.now()) / 1000);
-  if (left <= 0) { stopRest(); navigator.vibrate && navigator.vibrate([300, 120, 300]); toast('⏱️ Repos terminé, série suivante !'); return; }
-  slot.innerHTML = `<div class="timer"><span>Repos ⏱️ ${Math.floor(left / 60)}:${pad(left % 60)}</span>
-    <span class="row" style="gap:6px"><button class="btn sm" id="t-plus">+30s</button><button class="btn sm" id="t-skip">Passer</button></span></div>`;
-  $('#t-plus').onclick = () => { restTimer.end += 30000; renderTimer(); };
-  $('#t-skip').onclick = stopRest;
+  if (left <= 0) {
+    stopRest(); beep(1046, 0.45, 0.35); navigator.vibrate && navigator.vibrate([300, 120, 300]);
+    toast('⏱️ C\'est reparti !'); return;
+  }
+  if (left <= 3 && restTimer.last !== left) { beep(880, 0.1); navigator.vibrate && navigator.vibrate(80); }
+  restTimer.last = left;
+  const pct = Math.max(0, Math.min(100, 100 * (1 - (restTimer.end - Date.now()) / 1000 / restTimer.total)));
+  if (!slot.querySelector('.timer')) {
+    slot.innerHTML = `<div class="timer"><div class="t-ring"><span class="t-num"></span></div>
+      <div class="t-mid"><div class="t-lbl"></div><div class="t-bar"><i></i></div></div>
+      <div class="t-btns"><button class="btn sm" id="t-plus">+15 s</button><button class="btn sm" id="t-skip">Passer</button></div></div>`;
+    $('#t-plus').onclick = () => { restTimer.end += 15000; restTimer.total += 15; renderTimer(); };
+    $('#t-skip').onclick = stopRest;
+  }
+  slot.querySelector('.t-num').textContent = `${Math.floor(left / 60)}:${pad(left % 60)}`;
+  slot.querySelector('.t-lbl').textContent = restTimer.label;
+  slot.querySelector('.t-ring').style.setProperty('--p', pct.toFixed(1));
+  slot.querySelector('.t-bar i').style.width = pct + '%';
+  slot.querySelector('.timer').classList.toggle('hot', left <= 3);
 }
 
 /* ================= CORPS ================= */
@@ -2034,6 +2175,7 @@ VIEWS.settings = async () => {
   let est = null, persisted = null;
   try { est = navigator.storage && await navigator.storage.estimate(); } catch { }
   try { persisted = navigator.storage && navigator.storage.persisted && await navigator.storage.persisted(); } catch { }
+  const restP = { ...REST_DEF, ...(await getSetting('restPrefs', {})) };
   const mb = v => v > 1e9 ? r1(v / 1e9) + ' Go' : Math.round(v / 1e6) + ' Mo';
 
   view().innerHTML = `
@@ -2050,6 +2192,15 @@ VIEWS.settings = async () => {
         <div><label>Masse grasse objectif (%)</label><input id="g-tbf" inputmode="decimal" value="${goals.targetBF ?? ''}"></div>
       </div>
       <button class="btn primary block" id="g-save" style="margin-top:14px">Enregistrer les objectifs</button>
+    </div>
+
+    <div class="card"><h2>Minuteur de repos</h2>
+      <div class="small muted">Se lance tout seul quand tu valides une série (✓). Bip et vibration à la fin.</div>
+      <div class="grid2">
+        <div><label>Entre les séries (s)</label><input id="r-set" inputmode="numeric" value="${restP.set}"></div>
+        <div><label>Entre les exercices (s)</label><input id="r-ex" inputmode="numeric" value="${restP.ex}"></div>
+      </div>
+      <button class="btn block" id="r-save" style="margin-top:12px">Enregistrer le minuteur</button>
     </div>
 
     <div class="card"><h2>Coach nutrition</h2>
@@ -2096,6 +2247,10 @@ VIEWS.settings = async () => {
     await setSetting('nutritionContext', $('#k-ctx').value.trim());
   };
   $('#k-eye').onclick = () => { const i = $('#k-key'); i.type = i.type === 'password' ? 'text' : 'password'; };
+  $('#r-save').onclick = async () => {
+    const v = (id, d) => Math.min(600, Math.max(10, parseInt($(id).value) || d));
+    await setSetting('restPrefs', { set: v('#r-set', 30), ex: v('#r-ex', 90) }); toast('Minuteur enregistré ✓');
+  };
   $('#k-save').onclick = async () => { await saveKey(); toast('Coach nutrition enregistré ✓'); };
   $('#k-test').onclick = async () => {
     await saveKey();
@@ -2186,6 +2341,7 @@ async function importBackup(file) {
   try { await seedProgramme(); } catch (e) { console.error(e); }
   try { if (navigator.storage && navigator.storage.persist && !(await navigator.storage.persisted())) navigator.storage.persist(); } catch { }
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => { });
+  setTimeout(prefetchDemos, 5000);
   go('home');
 })();
 
