@@ -1,0 +1,16 @@
+{
+  "name": "Summer Body Hicham",
+  "short_name": "Summer Body",
+  "description": "Suivi sportif et alimentaire personnel, 100 % hors ligne.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#e4f3ec",
+  "theme_color": "#e4f3ec",
+  "lang": "fr",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
