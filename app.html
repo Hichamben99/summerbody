@@ -362,6 +362,21 @@ html,body{overflow-x:clip}
 .cmp-tag{position:absolute;top:10px;background:rgba(0,0,0,.55);color:#fff;font-size:12px;font-weight:700;padding:4px 8px;border-radius:10px}
 .cmp-tag.l{left:10px}.cmp-tag.r{right:10px}
 
+/* v2.4 : alternatives */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:0;border-radius:999px;padding:6px 10px;font:inherit;font-size:12px;font-weight:700;background:rgba(255,255,255,.8);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08);cursor:pointer}
+.chip.on{background:var(--teal);color:#fff}
+.alt-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.alt-row{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.75);border:0;border-radius:14px;padding:8px;text-align:left;font:inherit;color:inherit}
+.alt-row.cur{outline:2px solid var(--teal)}
+.alt-row.orig{cursor:pointer}
+.alt-row>span:nth-child(2),.alt-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.alt-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.alt-tags i{font-style:normal;font-size:10.5px;background:var(--teal-soft);border-radius:8px;padding:1px 6px}
+.alt-btns{display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex:none}
+.demo-row .demo-in{display:flex;align-items:center;gap:10px;flex:1;min-width:0;background:none;border:0;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.demo-row .demo-in>span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column}
+
 </style>
 </head>
 <body>
@@ -391,7 +406,7 @@ html,body{overflow-x:clip}
 'use strict';
 /* Summer Body — appli de suivi 100 % locale (IndexedDB). Aucune donnée ne quitte le téléphone. */
 
-const APP_VERSION = '2.3.0';
+const APP_VERSION = '2.4.0';
 
 /* ---------------- Base de données locale ---------------- */
 const DB_NAME = 'summerbody';
@@ -690,6 +705,8 @@ const DEMOS = [
 ];
 const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 function demoFor(name) {
+  const al = typeof ALT_BY !== 'undefined' && ALT_BY[name];
+  if (al) return al.id ? { id: al.id, cues: al.how ? [al.how] : [], urls: (al.frames || [0, 1]).map(f => `${DEMO_BASE}${al.id}/${f}.jpg`) } : null;
   const n = norm(name); const d = DEMOS.find(x => x[0].test(n)); if (!d) return null;
   const frames = d[3] || [0, 1];
   return { id: d[1], cues: d[2], urls: frames.map(f => `${DEMO_BASE}${d[1]}/${f}.jpg`) };
@@ -698,17 +715,146 @@ function demoAnim(d, cls = '') {
   if (!d) return `<span class="anim none ${cls}"><span>🏋️</span></span>`;
   return `<span class="anim ${d.urls.length > 1 ? 'flip' : ''} ${cls}">${d.urls.map(u => `<img src="${u}" alt="" crossorigin="anonymous" loading="lazy" onerror="this.parentNode.classList.add('off')">`).join('')}<span class="ph">📶</span></span>`;
 }
-function demoSheet(name, tip) {
-  const d = demoFor(name);
+function demoSheet(name, tip, back) {
+  const d = demoFor(name), al = ALT_BY[name];
   openSheet(`<h2>${esc(name)}</h2>
-    ${d ? demoAnim(d, 'big') : '<div class="muted small">Pas encore d\'animation pour cet exercice : regarde les vidéos ci-dessous.</div>'}
+    ${d ? demoAnim(d, 'big') : `<div class="muted small">Pas encore d'animation pour cet exercice : regarde les vidéos ci-dessous.</div>${al && al.how ? `<div class="card mint small" style="margin-top:10px">${esc(al.how)}</div>` : ''}`}
     ${d ? `<ol class="cues">${d.cues.map(c => `<li>${esc(c)}</li>`).join('')}</ol>` : ''}
     ${tip ? `<div class="card yellow small" style="margin-top:10px">💡 ${esc(tip)}</div>` : ''}
     <a class="btn block" style="margin-top:12px" href="https://www.youtube.com/results?search_query=${encodeURIComponent(name + ' exécution technique')}" target="_blank" rel="noopener">▶ Voir des vidéos de l'exercice (YouTube)</a>
     ${d ? '<div class="small muted" style="margin-top:8px;text-align:center">Animation : Free Exercise DB (domaine public)</div>' : ''}
-    <div class="sheet-actions"><button class="btn ghost" id="dm-c" style="flex:1">Fermer</button></div>`);
-  $('#dm-c').onclick = closeSheet;
+    <div class="sheet-actions">${back ? '<button class="btn" id="dm-b" style="flex:1">← Alternatives</button>' : ''}<button class="btn ghost" id="dm-c" style="flex:1">Fermer</button></div>`);
+  $('#dm-c').onclick = closeSheet; if (back) $('#dm-b').onclick = back;
 }
+/* ---------------- Alternatives d'exercices (machine guidée, haltères, poulie, poids du corps, version douce) ---------------- */
+const ALT_TAGS = { m: '🏋️ Machine guidée', h: '💪 Haltères / barre', p: '🔗 Poulie', c: '🧍 Poids du corps', d: '🩹 Plus doux / débutant', x: '🏠 Sans salle' };
+const ALT_DB = [
+  ['Squat au Smith (guidé)', 'Smith_Machine_Squat', 'm', 'La barre est guidée : tu te concentres sur la descente sans gérer l\'équilibre.'],
+  ['Hack squat (machine)', 'Hack_Squat', 'md', 'Dos calé contre le dossier : très rassurant pour apprendre à descendre.'],
+  ['Presse à cuisses', 'Leg_Press', 'md', 'Aucune charge sur le dos, idéal si le squat te met mal à l\'aise.'],
+  ['Goblet squat (haltère)', 'Goblet_Squat', 'hdx', 'Haltère tenu contre la poitrine : le buste reste droit tout seul.'],
+  ['Squat au poids du corps', 'Bodyweight_Squat', 'cdx', 'Descends sur une chaise ou un banc pour contrôler la profondeur. 15–20 reps.'],
+  ['Chest press (machine)', 'Leverage_Chest_Press', 'md', 'Trajectoire guidée, pas besoin de pareur.'],
+  ['Développé couché au Smith', 'Smith_Machine_Bench_Press', 'm', 'Barre guidée avec crochets de sécurité.'],
+  ['Développé couché haltères', 'Dumbbell_Bench_Press', 'hd', 'Chaque bras travaille seul, plus naturel pour les épaules.'],
+  ['Écarté à la poulie (vis-à-vis)', 'Cable_Crossover', 'pd', 'Tension continue, très doux pour les épaules. 12–15 reps.'],
+  ['Pompes', 'Pushups', 'cx', 'Corps gainé comme une planche. Trop dur : mains sur un banc.'],
+  ['Pompes mains sur un banc', 'Incline_Push-Up', 'cdx', 'Version plus facile des pompes : plus le banc est haut, plus c\'est léger.'],
+  ['Pompes pieds surélevés', 'Push-Ups_With_Feet_Elevated', 'cx', 'Cible le haut des pectoraux, comme le développé incliné.'],
+  ['Développé incliné à la machine', 'Leverage_Incline_Chest_Press', 'md', 'Même angle que l\'incliné, trajectoire guidée.'],
+  ['Développé incliné au Smith', 'Smith_Machine_Incline_Bench_Press', 'm', 'Banc à 30° sous la barre guidée.'],
+  ['Écarté poulie bas vers haut', 'Low_Cable_Crossover', 'pd', 'Monte les mains vers le menton : haut des pecs sans charge lourde.'],
+  ['Rowing assis à la poulie', 'Seated_Cable_Rows', 'pd', 'Assis, dos droit : le plus simple pour sentir le dos.'],
+  ['Rowing machine (appui poitrine)', 'Leverage_High_Row', 'md', 'Poitrine calée contre l\'appui : impossible de tricher avec le bas du dos.'],
+  ['Rowing haltère un bras', 'One-Arm_Dumbbell_Row', 'h', 'Appui sur le banc, tire vers la hanche.'],
+  ['Rowing inversé (barre basse ou TRX)', 'Inverted_Row', 'cx', 'Plus les pieds sont avancés, plus c\'est dur.'],
+  ['Shoulder press (machine)', 'Leverage_Shoulder_Press', 'md', 'Dos calé, trajectoire guidée : épaules en sécurité.'],
+  ['Développé militaire au Smith', 'Smith_Machine_Overhead_Shoulder_Press', 'm', 'Assis sur un banc à 80°, barre guidée.'],
+  ['Développé épaules à la poulie', 'Cable_Shoulder_Press', 'pd', 'Mouvement fluide et doux pour les articulations.'],
+  ['Pompes piquées (épaules)', null, 'cx', 'Fesses en l\'air, tête qui descend entre les mains. Trop dur : mains sur un banc.'],
+  ['Curl marteau', 'Hammer_Curls', 'hd', 'Prise neutre : plus confortable pour les poignets et les coudes.'],
+  ['Curl à la poulie', 'Standing_Biceps_Cable_Curl', 'pd', 'Tension constante, facile à contrôler.'],
+  ['Curl à la machine (pupitre)', 'Machine_Bicep_Curl', 'md', 'Bras calés : aucun balancement possible.'],
+  ['Tractions supination (chin-up)', 'Chin-Up', 'c', 'Paumes vers toi : biceps + dos. Avec élastique si besoin.'],
+  ['Planche (gainage)', 'Plank', 'cdx', '3 × 30–45 s, corps bien aligné.'],
+  ['Gainage latéral', 'Side_Bridge', 'cdx', '3 × 20–30 s par côté : obliques et anti-rotation.'],
+  ['Dead bug', 'Dead_Bug', 'cdx', 'Dos collé au sol, bras et jambe opposés qui s\'allongent. 8 / côté.'],
+  ['Pallof press avec élastique', null, 'x', 'Même mouvement que la poulie, élastique accroché à un poteau.'],
+  ['Soulevé de terre roumain haltères', 'Stiff-Legged_Dumbbell_Deadlift', 'hd', 'Plus léger et plus facile à placer que la barre.'],
+  ['Hip thrust (barre ou machine)', 'Barbell_Hip_Thrust', 'hd', 'Haut du dos sur le banc, pousse les hanches vers le plafond. Zéro stress pour le bas du dos.'],
+  ['Leg curl (machine)', 'Lying_Leg_Curls', 'md', 'Isole les ischios sans charger le dos.'],
+  ['Extension lombaire (banc à 45°)', 'Hyperextensions_Back_Extensions', 'md', 'Fessiers et ischios, descente contrôlée.'],
+  ['Pont fessier au sol', 'Butt_Lift_Bridge', 'cdx', 'Pieds près des fesses, serre les fessiers en haut. 15–20 reps.'],
+  ['Tractions assistées (machine)', null, 'md', 'Plus tu mets de contrepoids, plus c\'est facile. Le meilleur chemin vers les vraies tractions.'],
+  ['Tractions avec élastique', 'Band_Assisted_Pull-Up', 'cd', 'L\'élastique t\'aide en bas du mouvement.'],
+  ['Tractions', 'Pullups', 'c', 'Si tu fais plus de 8 reps propres au tirage avec ton poids.'],
+  ['Tirage vertical prise large', 'Wide-Grip_Lat_Pulldown', 'm', 'Barre vers le haut de la poitrine.'],
+  ['Tirage vertical prise serrée', 'Close-Grip_Front_Lat_Pulldown', 'md', 'Poignée triangle, coudes le long du corps.'],
+  ['Tirage bras tendus à la poulie', 'Straight-Arm_Pulldown', 'pd', 'Bras presque tendus, ramène la barre vers les cuisses.'],
+  ['Fentes au Smith', 'Smith_Single-Leg_Split_Squat', 'm', 'Barre guidée : tu ne gères plus l\'équilibre.'],
+  ['Presse à une jambe', 'Leg_Press', 'md', 'Un pied au centre de la plateforme, charge divisée par deux.'],
+  ['Fentes arrière haltères', 'Dumbbell_Rear_Lunge', 'hd', 'Le pas en arrière est plus doux pour les genoux.'],
+  ['Step-up sur banc', 'Dumbbell_Step_Ups', 'hdx', 'Monte sur un banc en poussant sur le talon. Avec ou sans haltères.'],
+  ['Fentes au poids du corps', 'Bodyweight_Walking_Lunge', 'cdx', 'Fentes marchées, 12 / jambe.'],
+  ['Fentes bulgares', 'One_Leg_Barbell_Squat', 'h', 'Pied arrière sur le banc.'],
+  ['Élévations latérales à la poulie', 'Cable_Seated_Lateral_Raise', 'pd', 'Tension constante, très doux pour l\'épaule.'],
+  ['Élévations latérales assis', 'Seated_Side_Lateral_Raise', 'hd', 'Assis : impossible de prendre de l\'élan.'],
+  ['Élévations latérales élastique', 'Lateral_Raise_-_With_Bands', 'x', 'Pied sur l\'élastique, monte jusqu\'aux épaules.'],
+  ['Extension triceps à la corde', 'Triceps_Pushdown_-_Rope_Attachment', 'pd', 'Écarte la corde en bas : plus confortable pour les coudes.'],
+  ['Extension triceps haltère au-dessus de la tête', 'Standing_Dumbbell_Triceps_Extension', 'h', 'Coudes serrés, l\'haltère descend derrière la tête.'],
+  ['Dips assistés (machine)', 'Dip_Machine', 'md', 'Buste droit pour cibler les triceps.'],
+  ['Dips sur banc', 'Bench_Dips', 'cx', 'Mains sur un banc, jambes fléchies pour faciliter.'],
+  ['Pompes serrées', 'Push-Ups_-_Close_Triceps_Position', 'cx', 'Mains sous les épaules, coudes le long du corps.'],
+  ['Farmer walk à une main', 'Farmers_Walk', 'h', 'Un seul haltère : en plus, ton tronc résiste à l\'inclinaison.'],
+  ['Maintien d\'haltères (statique)', 'Farmers_Walk', 'hd', 'Debout, tiens 30–45 s sans bouger. Parfait si la salle est bondée.', [0]],
+  ['Suspension à la barre (dead hang)', 'Scapular_Pull-Up', 'c', 'Tiens le plus longtemps possible.', [0]],
+  ['Suspension pieds au sol (assistée)', 'Scapular_Pull-Up', 'cd', 'Barre basse ou Smith : garde les pieds au sol pour enlever du poids.', [0]],
+  ['Suspension à la serviette', null, 'c', 'Serviette autour de la barre : la poigne exacte des saisies au kimono.'],
+  ['Leg extension (machine)', 'Leg_Extensions', 'md', 'Isole les quadriceps : bien si les genoux râlent au squat.'],
+  ['Oiseau haltères (buste penché)', 'Seated_Bent-Over_Rear_Delt_Raise', 'hd', 'Assis, buste sur les cuisses, ouvre les bras sur les côtés.'],
+  ['Reverse pec deck (machine)', 'Reverse_Machine_Flyes', 'md', 'Face à la machine, ouvre les bras en arrière.'],
+  ['Face pull élastique', 'Back_Flyes_-_With_Bands', 'x', 'Élastique à hauteur du visage, tire vers le front.'],
+  ['Développé couché barre', 'Barbell_Bench_Press_-_Medium_Grip', 'h', 'Si tu es à l\'aise et que le banc est libre.'],
+];
+const ALT_BY = Object.fromEntries(ALT_DB.map(a => [a[0], { nom: a[0], id: a[1], tags: a[2], how: a[3], frames: a[4] }]));
+const EX_ALTS = [
+  [/^squat/, ['Squat au Smith (guidé)', 'Hack squat (machine)', 'Presse à cuisses', 'Goblet squat (haltère)', 'Squat au poids du corps']],
+  [/couche barre/, ['Chest press (machine)', 'Développé couché au Smith', 'Développé couché haltères', 'Pompes', 'Pompes mains sur un banc']],
+  [/rowing haltere/, ['Rowing machine (appui poitrine)', 'Rowing assis à la poulie', 'Rowing inversé (barre basse ou TRX)']],
+  [/militaire/, ['Shoulder press (machine)', 'Développé militaire au Smith', 'Développé épaules à la poulie', 'Pompes piquées (épaules)']],
+  [/^curl biceps/, ['Curl marteau', 'Curl à la poulie', 'Curl à la machine (pupitre)', 'Tractions supination (chin-up)']],
+  [/pallof/, ['Gainage latéral', 'Dead bug', 'Planche (gainage)', 'Pallof press avec élastique']],
+  [/roumain/, ['Soulevé de terre roumain haltères', 'Hip thrust (barre ou machine)', 'Leg curl (machine)', 'Extension lombaire (banc à 45°)', 'Pont fessier au sol']],
+  [/tirage vertical \(|tirage vertical$/, ['Tractions assistées (machine)', 'Tractions avec élastique', 'Tirage bras tendus à la poulie', 'Rowing inversé (barre basse ou TRX)', 'Tractions']],
+  [/incline/, ['Développé incliné à la machine', 'Développé incliné au Smith', 'Écarté poulie bas vers haut', 'Pompes pieds surélevés']],
+  [/bulgare/, ['Fentes au Smith', 'Presse à une jambe', 'Fentes arrière haltères', 'Step-up sur banc', 'Fentes au poids du corps']],
+  [/elevations laterales/, ['Élévations latérales à la poulie', 'Élévations latérales assis', 'Élévations latérales élastique']],
+  [/triceps/, ['Extension triceps à la corde', 'Dips assistés (machine)', 'Extension triceps haltère au-dessus de la tête', 'Dips sur banc', 'Pompes serrées']],
+  [/farmer/, ['Farmer walk à une main', 'Maintien d\'haltères (statique)', 'Suspension à la barre (dead hang)']],
+  [/^presse/, ['Hack squat (machine)', 'Goblet squat (haltère)', 'Leg extension (machine)', 'Squat au poids du corps']],
+  [/couche halteres/, ['Chest press (machine)', 'Développé couché barre', 'Écarté à la poulie (vis-à-vis)', 'Pompes']],
+  [/rowing assis|rowing.*poulie/, ['Rowing machine (appui poitrine)', 'Rowing haltère un bras', 'Rowing inversé (barre basse ou TRX)']],
+  [/tirage vertical prise serree/, ['Tractions assistées (machine)', 'Tirage vertical prise large', 'Tirage bras tendus à la poulie', 'Tractions supination (chin-up)']],
+  [/face pull/, ['Reverse pec deck (machine)', 'Oiseau haltères (buste penché)', 'Face pull élastique']],
+  [/dead hang|suspension/, ['Suspension pieds au sol (assistée)', 'Maintien d\'haltères (statique)', 'Suspension à la serviette']],
+];
+function altsFor(origName) {
+  const n = norm(origName), hit = EX_ALTS.find(x => x[0].test(n));
+  return hit ? hit[1].map(a => ALT_BY[a]).filter(Boolean) : [];
+}
+let SWAPS = {};
+async function getSwaps() { SWAPS = await getSetting('exSwaps', {}); return SWAPS; }
+const swapName = nom => SWAPS[nom] || nom;
+/* Fiche « Alternatives » : opts.onPick(nom, always) ; opts.current = nom en cours ; opts.orig = nom du programme */
+async function altSheet(orig, current, onPick, alwaysDefault = false) {
+  const alts = altsFor(orig); const swaps = await getSwaps();
+  let filter = '';
+  const draw = () => {
+    const list = alts.filter(a => !filter || a.tags.includes(filter));
+    const tagsUsed = [...new Set(alts.flatMap(a => a.tags.split('')))];
+    openSheet(`<h2>Alternatives</h2>
+      <div class="small muted">À la place de <b>${esc(orig)}</b>. Garde les mêmes séries et répétitions ; nouvelle charge = commence léger, 2–3 reps en réserve.</div>
+      <div class="chips" style="margin-top:10px"><button class="chip ${!filter ? 'on' : ''}" data-f="">Tout</button>${tagsUsed.map(t => `<button class="chip ${filter === t ? 'on' : ''}" data-f="${t}">${ALT_TAGS[t]}</button>`).join('')}</div>
+      <label class="row small" style="gap:8px;margin:10px 0 2px;align-items:center"><input type="checkbox" id="al-always" ${swaps[orig] || alwaysDefault ? 'checked' : ''} style="width:auto"> Toujours utiliser mon choix pour cet exercice</label>
+      <div class="alt-list">
+        ${current !== orig ? `<button class="alt-row orig" data-n="${esc(orig)}">${demoAnim(demoFor(orig), 'mini')}<span><b>↩ ${esc(orig)}</b><span class="small muted">Revenir à l'exercice du programme</span></span></button>` : ''}
+        ${list.map(a => `<div class="alt-row ${a.nom === current ? 'cur' : ''}">${demoAnim(demoFor(a.nom), 'mini')}
+          <span class="alt-txt"><b>${esc(a.nom)}</b><span class="small muted">${esc(a.how)}</span><span class="alt-tags">${a.tags.split('').map(t => `<i>${ALT_TAGS[t]}</i>`).join('')}</span></span>
+          <span class="alt-btns"><button class="btn sm" data-see="${esc(a.nom)}">Voir</button>${a.nom === current ? '<span class="small" style="font-weight:700">✓</span>' : `<button class="btn sm primary" data-n="${esc(a.nom)}">Choisir</button>`}</span></div>`).join('')}
+      </div>
+      <div class="sheet-actions"><button class="btn ghost" id="al-c" style="flex:1">Fermer</button></div>`);
+    document.querySelectorAll('.chips [data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; draw(); });
+    document.querySelectorAll('[data-see]').forEach(b => b.onclick = () => demoSheet(b.dataset.see, '', () => altSheet(orig, current, onPick, alwaysDefault)));
+    document.querySelectorAll('.alt-list [data-n]').forEach(b => b.onclick = async () => {
+      const name = b.dataset.n, always = $('#al-always').checked, sw = await getSwaps();
+      if (always && name !== orig) sw[orig] = name; else delete sw[orig];
+      await setSetting('exSwaps', sw); SWAPS = sw; closeSheet(); onPick(name, always);
+    });
+    $('#al-c').onclick = closeSheet;
+  };
+  draw();
+}
+
 async function prefetchDemos() {
   try {
     if (!navigator.onLine || (await getSetting('demosCached')) === DEMO_VER) return;
@@ -1720,15 +1866,16 @@ async function mealSheet(meal) {
 let restTimer = null;
 
 async function startSession(day) {
-  const workouts = await dbAll('workouts');
+  const workouts = await dbAll('workouts'); await getSwaps();
   const s = {
     id: uid(), date: dateKey(), start: timeNow(), ts: Date.now(),
     name: day ? day.nom : 'Séance libre', programDay: day ? day.nom : null,
     deload: isDeload(dateKey()), technique: progWeek(dateKey()) >= 1 && progWeek(dateKey()) <= 2,
     exercises: day ? day.exercices.map(e => {
       const series = Math.max(1, (e.series || 3) - (isDeload(dateKey()) ? 1 : 0));
-      return { name: e.nom, target: e.reps ? `${series}×${e.reps}` : '', rest: e.repos || 90, tip: e.conseil || '',
-        sets: [...Array(series)].map((_, i) => prefillSet(workouts, e.nom, i)) };
+      const nm = swapName(e.nom), al = nm !== e.nom ? ALT_BY[nm] : null;
+      return { name: nm, orig: e.nom, target: e.reps ? `${series}×${e.reps}` : '', rest: e.repos || 90, tip: al ? al.how : (e.conseil || ''),
+        sets: [...Array(series)].map((_, i) => prefillSet(workouts, nm, i)) };
     }) : [],
   };
   await setSetting('activeSession', s);
@@ -1922,7 +2069,8 @@ function daySheet(k, s, ws) {
   openSheet(`<h2 style="text-transform:capitalize">${fmtDay(k)}</h2>
     <div class="muted small">${p.inProg ? `Semaine ${progWeek(k)}/17${phaseOf(k) ? ` · Phase ${phaseOf(k).n} : ${esc(phaseOf(k).nom)}` : ''}` : esc(p.label)}</div>
     <div class="card ${p.kind === 'gym' ? 'mint' : p.kind === 'jjb' ? 'lilac' : ''}" style="margin-top:12px"><div style="font-size:17px;font-weight:800">${p.ico} ${esc(p.label)}</div>
-      ${p.kind === 'gym' ? `<div class="demo-list">${p.seance.exercices.map((e, i) => `<button class="demo-row" data-dx="${i}">${demoAnim(demoFor(e.nom), 'mini')}<span><b>${esc(e.nom)}</b><span class="small muted">${e.series}×${esc(e.reps || '')}</span></span><span class="muted">›</span></button>`).join('')}</div>` : ''}
+      ${p.kind === 'gym' ? `<div class="demo-list">${p.seance.exercices.map((e, i) => { const nm = swapName(e.nom); return `<div class="demo-row"><button class="demo-in" data-dx="${i}">${demoAnim(demoFor(nm), 'mini')}<span><b>${esc(nm)}</b><span class="small muted">${e.series}×${esc(e.reps || '')}${nm !== e.nom ? ` · remplace ${esc(e.nom)}` : ''}</span></span></button>${altsFor(e.nom).length ? `<button class="btn sm" data-ax="${i}" title="Alternatives">🔄</button>` : ''}</div>`; }).join('')}</div>
+      <div class="small muted" style="margin-top:6px">🔄 = choisir une alternative (machine, haltères, poids du corps…) pour toutes les prochaines séances.</div>` : ''}
       ${p.deload ? '<div class="small" style="margin-top:6px;font-weight:700">Semaine allégée : une série de moins.</div>' : ''}
       ${p.checkin ? '<div class="small" style="margin-top:6px;font-weight:700">📸 Check-in : balance Basic-Fit, tour de taille, photos.</div>' : ''}
       ${p.festive ? '<div class="small" style="margin-top:6px">🎄 Fêtes : profite, garde les protéines et la salle.</div>' : ''}</div>
@@ -1934,7 +2082,8 @@ function daySheet(k, s, ws) {
   $('#ds-c').onclick = closeSheet;
   const goB = $('#ds-go'); if (goB) goB.onclick = async () => { closeSheet(); await startSession(p.seance); trainMode = 'seances'; go('train'); };
   const jb = $('#ds-jjb'); if (jb) jb.onclick = () => jjbSheet(k);
-  document.querySelectorAll('[data-dx]').forEach(el => el.onclick = () => { const e = p.seance.exercices[+el.dataset.dx]; demoSheet(e.nom, e.conseil); });
+  document.querySelectorAll('[data-dx]').forEach(el => el.onclick = () => { const e = p.seance.exercices[+el.dataset.dx], nm = swapName(e.nom); demoSheet(nm, nm === e.nom ? e.conseil : '', () => daySheet(k, s, ws)); });
+  document.querySelectorAll('[data-ax]').forEach(el => el.onclick = () => { const e = p.seance.exercices[+el.dataset.ax]; altSheet(e.nom, swapName(e.nom), () => daySheet(k, s, ws), true); });
   document.querySelectorAll('.hist2').forEach(el => el.onclick = () => workoutDetail(ws.find(w => w.id === el.dataset.id)));
 }
 
@@ -1997,6 +2146,14 @@ async function renderSession(s) {
       persistSession(s);
     } else if (b.dataset.act === 'sugg') {
       s.exercises[ei].sets.forEach(x => { if (!x.done) x.weight = b.dataset.w; }); persistSession(s); renderSession(s); toast('Charge appliquée 💪');
+    } else if (b.dataset.act === 'alt') {
+      const ex = s.exercises[ei], orig = ex.orig || ex.name;
+      altSheet(orig, ex.name, async (nm) => {
+        const ws = await dbAll('workouts'), al = nm !== orig ? ALT_BY[nm] : null, pe = (PROGRAMME_SB.jours.flatMap(j => j.exercices).find(x => x.nom === orig) || {});
+        ex.orig = orig; ex.name = nm; ex.tip = al ? al.how : (pe.conseil || '');
+        ex.sets = ex.sets.map((x, i) => x.done ? x : prefillSet(ws, nm, i));
+        persistSession(s); renderSession(s); toast(nm === orig ? 'Exercice d\'origine remis' : '🔄 ' + nm);
+      });
     } else if (b.dataset.act === 'demo') {
       demoSheet(s.exercises[ei].name, s.exercises[ei].tip);
     } else if (b.dataset.act === 'addset') {
@@ -2068,9 +2225,10 @@ function exHTML(e, ei, workouts, sess) {
   return `<div class="ex">
     <div class="ex-top"><button class="demo-th" data-ei="${ei}" data-act="demo" aria-label="Voir la démo">${demoAnim(demoFor(e.name))}<span class="play">▶</span></button>
       <div style="flex:1;min-width:0"><div class="ex-head"><b>${esc(e.name)}</b></div>
+      ${e.orig && e.orig !== e.name ? `<div class="small" style="color:var(--teal);font-weight:700">🔄 remplace ${esc(e.orig)}</div>` : ''}
       <div class="small muted">${esc(e.target || '')}</div>
       <div class="small muted">⏱️ ${fmtRest(restPrefs.set)} entre séries · ${fmtRest(restPrefs.ex)} avant l'exo suivant</div>
-      <button class="link-btn small" data-ei="${ei}" data-act="demo">Voir comment faire ›</button></div></div>
+      <div class="row" style="gap:14px"><button class="link-btn small" data-ei="${ei}" data-act="demo">Voir comment faire ›</button>${altsFor(e.orig || e.name).length ? `<button class="link-btn small" data-ei="${ei}" data-act="alt">🔄 Alternatives</button>` : ''}</div></div></div>
     ${e.tip ? `<div class="small muted" style="margin-top:6px">💡 ${esc(e.tip)}</div>` : ''}
     ${sg ? `<div class="sugg ${sg.up ? 'up' : ''}"><span>${sg.up ? '📈' : '🎯'} ${esc(sg.txt)}</span>${e.sets.some(x => !x.done && String(x.weight) !== String(sg.w)) ? `<button class="btn sm" data-ei="${ei}" data-act="sugg" data-w="${sg.w}">Appliquer</button>` : ''}</div>` : ''}
     ${lp ? `<div class="prev">Dernière fois (${fmtShort(lp.date)}) : ${lp.sets.map(s => `${s.weight || 0}×${s.reps || 0}`).join(', ') || '—'}</div>` : ''}
@@ -2509,6 +2667,7 @@ async function importBackup(file) {
   $('#date-label').textContent = new Date().toLocaleDateString('fr-BE', { weekday: 'long', day: 'numeric', month: 'long' });
   await openDB();
   try { await seedProgramme(); } catch (e) { console.error(e); }
+  await getSwaps();
   try { if (navigator.storage && navigator.storage.persist && !(await navigator.storage.persisted())) navigator.storage.persist(); } catch { }
   if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => { });
   setTimeout(prefetchDemos, 5000);
