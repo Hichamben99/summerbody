@@ -438,7 +438,7 @@ html,body{overflow-x:clip}
 'use strict';
 /* Summer Body — appli de suivi 100 % locale (IndexedDB). Aucune donnée ne quitte le téléphone. */
 
-const APP_VERSION = '2.5.1';
+const APP_VERSION = '2.5.2';
 
 /* ---------------- Base de données locale ---------------- */
 const DB_NAME = 'summerbody';
@@ -1138,7 +1138,12 @@ function dayStatus(k, rec, ix) {
   const tasks = tasksFor(k, (rec && rec.custom) || []);
   const d = ix[k] || { meals: { matin: 0, midi: 0, soir: 0 }, prot: 0, workouts: 0, jjb: 0, weigh: false, checkin: false };
   const done = (rec && rec.done) || {};
-  const list = tasks.map(t => ({ ...t, autoDone: !!(t.auto && t.auto(d)), done: !!done[t.id] || !!(t.auto && t.auto(d)) }));
+  // Automatique par défaut ; une correction manuelle (true/false dans rec.done) l'emporte toujours.
+  const list = tasks.map(t => {
+    const autoDone = !!(t.auto && t.auto(d));
+    const manual = Object.prototype.hasOwnProperty.call(done, t.id);
+    return { ...t, autoDone, manual, done: manual ? !!done[t.id] : autoDone };
+  });
   const xp = list.filter(t => t.done).reduce((a, t) => a + t.xp, 0);
   const perfect = list.length > 0 && list.every(t => t.done);
   return { list, xp: xp + (perfect ? 50 : 0), perfect, doneCount: list.filter(t => t.done).length };
@@ -1171,7 +1176,8 @@ async function computeGame() {
     const k = dateKey(d), st = dayStatus(k, recs[k], ix);
     xp += st.xp; daysXp[k] = st.xp;
     if (st.perfect) perfectDays++;
-    if ((ix[k] || {}).prot >= 140 || (recs[k] && recs[k].done && recs[k].done.protein)) protDays++;
+    const pt = st.list.find(t => t.id === 'protein');
+    if (pt ? pt.done : (ix[k] || {}).prot >= 140) protDays++;
     const main = st.list.find(t => t.id === 'main');
     if (main && main.done && /Jiu-jitsu/.test(main.label)) jjb++;
   }
@@ -1220,9 +1226,9 @@ async function getDayRec(k) { return (await getSetting('day:' + k)) || { done: {
 async function toggleTask(k, t) {
   const before = await computeGame();
   const rec = await getDayRec(k);
-  if (t.autoDone && !rec.done[t.id]) { toast('✓ Déjà validée automatiquement'); return; }
-  rec.done[t.id] = !rec.done[t.id];
-  if (!rec.done[t.id]) delete rec.done[t.id];
+  const next = !t.done;
+  if (t.auto && next === t.autoDone) { delete rec.done[t.id]; toast('↺ Revenue en automatique'); }
+  else { rec.done[t.id] = next; if (t.auto) toast(next ? '✓ Validée manuellement' : '✗ Décochée (correction manuelle)'); }
   await setSetting('day:' + k, rec);
   const after = await computeGame();
   const diff = after.xp - before.xp;
@@ -1294,7 +1300,7 @@ function missionsHTML(st, k) {
   const row = t => `<div class="task ${t.done ? 'done' : ''} ${t.prio === 'haute' ? 'hi' : ''}" data-task="${t.id}">
       <span class="tick">${t.done ? '✓' : ''}</span>
       <span class="tl"><span class="tx">${esc(t.label)}</span>${t.hint ? `<span class="th">${esc(t.hint)}</span>` : ''}</span>
-      <span class="xp">${t.autoDone ? 'auto · ' : ''}+${t.xp}</span>
+      <span class="xp">${t.auto && t.manual && t.done !== t.autoDone ? 'corrigé · ' : t.autoDone && t.done ? 'auto · ' : ''}+${t.xp}</span>
       ${/^c[0-9a-z]{10,}$/.test(t.id) ? `<button class="rm" data-rm="${t.id}" aria-label="Retirer">×</button>` : ''}</div>`;
   const total = st.list.length, done = st.doneCount;
   return `<div class="card missions">
