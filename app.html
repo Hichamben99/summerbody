@@ -438,7 +438,7 @@ html,body{overflow-x:clip}
 'use strict';
 /* Summer Body — appli de suivi 100 % locale (IndexedDB). Aucune donnée ne quitte le téléphone. */
 
-const APP_VERSION = '2.5.2';
+const APP_VERSION = '2.5.3';
 
 /* ---------------- Base de données locale ---------------- */
 const DB_NAME = 'summerbody';
@@ -616,14 +616,16 @@ const quoteOfDay = () => { const d = new Date(); return QUOTES[(d.getFullYear() 
 /* ---------------- Navigation ---------------- */
 let currentTab = 'home';
 const VIEWS = {};
-async function go(tab) {
+async function go(tab, opts = {}) {
+  const keepY = opts.keepScroll ? window.scrollY : null;
   try { stopSpeak(); } catch { }
   currentTab = tab;
   document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   freeURLs();
   document.querySelectorAll('.fab').forEach(f => f.remove());
   await VIEWS[tab]();
-  if (!(tab === 'meals' && mealsMode === 'chat')) window.scrollTo(0, 0);
+  if (keepY != null) window.scrollTo(0, keepY);
+  else if (!(tab === 'meals' && mealsMode === 'chat')) window.scrollTo(0, 0);
 }
 document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.dataset.tab));
 
@@ -1291,7 +1293,7 @@ function addTaskSheet(k) {
   $('#nt-ok').onclick = async () => {
     const label = $('#nt-l').value.trim(); if (!label) return;
     const rec = await getDayRec(k); rec.custom = rec.custom || []; rec.custom.push({ id: 'c' + uid(), slot, label });
-    await setSetting('day:' + k, rec); closeSheet(); go('home');
+    await setSetting('day:' + k, rec); closeSheet(); go('home', { keepScroll: true });
   };
 }
 
@@ -1491,7 +1493,7 @@ VIEWS.home = async () => {
   view().querySelectorAll('[data-rm]').forEach(b => b.onclick = async e => {
     e.stopPropagation();
     const r = await getDayRec(today); r.custom = (r.custom || []).filter(c => c.id !== b.dataset.rm); delete r.done[b.dataset.rm];
-    await setSetting('day:' + today, r); go('home');
+    await setSetting('day:' + today, r); go('home', { keepScroll: true });
   });
   view().querySelectorAll('[data-task]').forEach(el => el.onclick = async () => {
     const t = st.list.find(x => x.id === el.dataset.task); if (!t) return;
@@ -1501,7 +1503,10 @@ VIEWS.home = async () => {
       go('train'); return;
     }
     if (t.id === 'main' && /Jiu-jitsu/.test(t.label) && !t.done) { jjbSheet(today); return; }
-    await toggleTask(today, t); go('home');
+    // Retour visuel immédiat, puis mise à jour sans remonter la page
+    const on = !el.classList.contains('done'); el.classList.toggle('done', on);
+    const tick = el.querySelector('.tick, .mm-ic'); if (tick) tick.textContent = on ? '✓' : (tick.classList.contains('mm-ic') ? '🎯' : '');
+    await toggleTask(today, t); go('home', { keepScroll: true });
   });
   checkLevelUp(game);
 };
