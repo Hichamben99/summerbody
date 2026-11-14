@@ -438,7 +438,7 @@ html,body{overflow-x:clip}
 'use strict';
 /* Summer Body — appli de suivi 100 % locale (IndexedDB). Aucune donnée ne quitte le téléphone. */
 
-const APP_VERSION = '2.5.0';
+const APP_VERSION = '2.5.1';
 
 /* ---------------- Base de données locale ---------------- */
 const DB_NAME = 'summerbody';
@@ -1558,15 +1558,17 @@ async function renderJournal() {
   const tm = meals.filter(m => m.date === today);
   const S = k => Math.round(tm.reduce((a, m) => a + (m[k] || 0), 0));
   const kc = S('kcal'), P = S('p'), G = S('g'), Lp = S('l');
-  const macroK = P * 4 + G * 4 + Lp * 9 || 1;
+  // Cibles du jour : protéines 140 g, lipides ≈ 25 % des kcal, glucides = le reste
+  const kT = goals.kcalTarget || 2600;
+  const tP = 140, tL = Math.round(kT * 0.25 / 9), tG = Math.max(50, Math.round((kT - tP * 4 - tL * 9) / 4));
   const summary = `<div class="card">
       <div class="row between"><div><div class="small muted" style="font-weight:600">Calories aujourd'hui</div><div style="font-size:28px;font-weight:800;letter-spacing:-.6px">${kc.toLocaleString('fr-BE')} <span class="small muted">kcal</span></div></div>
         ${goals.kcalTarget ? `<div class="small muted" style="text-align:right">Repère<br><b style="color:var(--text)">${goals.kcalTarget.toLocaleString('fr-BE')}</b></div>` : ''}</div>
       ${goals.kcalTarget ? `<div class="bar"><i style="width:${Math.min(100, kc / goals.kcalTarget * 100)}%"></i></div>` : ''}
     </div>
     <div class="macros">
-      ${[['Protéines', P, P * 4, 'var(--teal)'], ['Glucides', G, G * 4, 'var(--peach)'], ['Lipides', Lp, Lp * 9, '#e5b93a']].map(([t, g, k, c]) =>
-        `<div class="macro"><span class="t">${t}</span>${ring(k / macroK * 100, { size: 58, stroke: 7, color: c, track: 'rgba(29,43,40,.07)', label: '', sub: Math.round(k / macroK * 100) + '%' })}<span class="v">${g} g</span></div>`).join('')}
+      ${[['Protéines', P, tP, 'var(--teal)'], ['Glucides', G, tG, 'var(--peach)'], ['Lipides', Lp, tL, '#e5b93a']].map(([t, g, tg, c]) =>
+        `<div class="macro"><span class="t">${t}</span>${ring(Math.min(100, g / tg * 100), { size: 58, stroke: 7, color: c, track: 'rgba(29,43,40,.07)', label: '', sub: Math.round(g / tg * 100) + '%' })}<span class="v">${g}<span class="muted" style="font-size:12px;font-weight:600"> / ${tg} g</span></span></div>`).join('')}
     </div>
     <div class="sec-title"><span>Mes repas</span></div>`;
 
@@ -1609,7 +1611,7 @@ async function renderChat() {
   const kcalToday = meals.filter(m => m.date === today).reduce((a, m) => a + (m.kcal || 0), 0);
   const goals = await getGoals();
 
-  const bubbles = msgs.slice(-80).map(m => {
+  const bubbles = msgs.filter(m => !(m.role === 'assistant' && !m.text && !m.loggedMealId)).slice(-80).map(m => {
     const meal = m.mealId && mealById[m.mealId];
     const photo = m.photo || (meal && meal.photo && m.role === 'user' ? meal.photo : null);
     let html = `<div class="msg ${m.role}">`;
@@ -1866,7 +1868,7 @@ ${extra ? `- Infos du coach (bilan personnel) : ${extra}` : ''}`;
 
 async function buildApiMessages(msgs) {
   // On garde les 16 derniers messages valides ; seules les 2 dernières photos sont envoyées (économie).
-  const usable = msgs.filter(m => m.role === 'user' || (m.role === 'assistant' && !m.status)).slice(-16);
+  const usable = msgs.filter(m => m.role === 'user' || (m.role === 'assistant' && !m.status && (m.raw || m.text))).slice(-16);
   const photoIdx = new Set(usable.map((m, i) => (m.role === 'user' && (m.photo || m.mealId)) ? i : -1).filter(i => i >= 0).slice(-2));
   const meals = Object.fromEntries((await dbAll('meals')).map(m => [m.id, m]));
   const out = [];
@@ -1915,7 +1917,7 @@ async function sendToCoach(opts = {}) {
     const model = await getSetting('model', MODELS[0][0]);
     let system = await buildSystemPrompt();
     if (opts.voice) system += "\n\nMODE VOCAL : Hicham te parle à voix haute et ta réponse sera lue par une voix de synthèse. Réponds en 2 à 4 phrases courtes et naturelles, comme à l'oral, sans tableau, sans liste à puces, sans titres ni émojis. Garde quand même le bloc <repas> si tu dois enregistrer un repas (il n'est pas lu). Sa transcription peut contenir des erreurs de dictée : devine le sens le plus probable.";
-    const body = { model, max_tokens: 900, system, messages: await buildApiMessages(msgs) };
+    const body = { model, max_tokens: 1500, system, messages: await buildApiMessages(msgs) };
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
@@ -1929,6 +1931,10 @@ async function sendToCoach(opts = {}) {
     const data = await res.json();
     const raw = (data.content || []).filter(c => c.type === 'text').map(c => c.text).join('\n').trim();
     const { clean, meal } = parseMealTag(raw);
+    if (!clean && !(meal && meal.kcal != null)) {
+      const why = data.stop_reason === 'max_tokens' ? 'réponse coupée (trop longue)' : data.stop_reason === 'refusal' ? 'le coach a refusé de répondre' : `réponse vide (${data.stop_reason || 'raison inconnue'})`;
+      throw Object.assign(new Error('Pas de réponse du coach'), { detail: why });
+    }
     const reply = { id: uid(), ts: Date.now(), role: 'assistant', text: clean, raw };
     const lastUser = pending[pending.length - 1];
     if (meal && meal.kcal != null) reply.loggedMealId = await logMealFromChat(meal, lastUser, msgs);
